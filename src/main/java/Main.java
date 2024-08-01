@@ -18,6 +18,11 @@ public class Main {
           serverSocket.setReuseAddress(true);
           // Wait for connection from client.
           clientSocket = serverSocket.accept();
+          //send response of ping
+          clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+          System.out.println("Received PONG from client!");
+
+
         } catch (IOException e) {
           System.out.println("IOException: " + e.getMessage());
         } finally {
