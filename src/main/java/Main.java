@@ -42,7 +42,7 @@ public class Main {
           while ((line = br.readLine()) != null) {
               System.out.println("send response of ping");
               if (line.equals("PING")) {
-                  outputStream.print("+PONG\r\n".getBytes());
+                  outputStream.print("+PONG\r\n");
                   outputStream.flush();
                   System.out.println("Received PONG from client!");
               }
