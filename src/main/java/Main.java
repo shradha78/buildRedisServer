@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -40,16 +37,17 @@ public class Main {
     private static void readMultiplePingsFromSameConnection(Socket clientSocket) throws IOException {
       try {
           BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-          OutputStream outputStream = clientSocket.getOutputStream();
+          PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
           String line;
           while ((line = br.readLine()) != null) {
               System.out.println("send response of ping");
               if (line.equals("PING")) {
-                  outputStream.write("+PONG\r\n".getBytes());
+                  outputStream.print("+PONG\r\n".getBytes());
+                  outputStream.flush();
                   System.out.println("Received PONG from client!");
               }
           }
-      }catch (RuntimeException re){
+      }catch (IOException re){
           System.out.println("Exception is " + re.getMessage()  + "\n" + re.getStackTrace() );
       }
     }
