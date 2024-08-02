@@ -35,31 +35,21 @@ public class Main {
   }
 
     private static void readMultiplePingsFromSameConnection(Socket clientSocket)  throws IOException{
-//      try {
-//
-//          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//          PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
-//          String line;
-//          while ((line = br.readLine()) != null) {
-//              System.out.printf("send response of ping \n");
-//              if (line.startsWith("*1") && br.readLine().equals("$4") && line.equalsIgnoreCase("PING")) {
-//                  outputStream.print("+PONG\r\n");
-//                  outputStream.flush();
-//                  System.out.printf("Received PONG from client! \n");
-//              }
-//          }
-//      }catch (IOException e){
-//          throw new RuntimeException(e);
-//      }
-//    }
-            try (BufferedReader in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()))) {
-                String userInput;
-                while ((userInput = in.readLine()) != null) {
-                    if (userInput.equals("PING")) {
-                        clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
-                    }
-                }
-            }
-        }
+      try {
+          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+          PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
+          String line;
+          while ((line = br.readLine()) != null) {
+              System.out.printf("send response of ping \n");
+              if (line.equalsIgnoreCase("PING")) {
+                  outputStream.print("+PONG\r\n");
+                  outputStream.flush();
+                  System.out.printf("Received PONG from client! \n");
+              }
+          }
+      }catch (IOException e){
+          throw new RuntimeException(e);
+      }
+    }
+
 }
