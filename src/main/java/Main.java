@@ -18,7 +18,7 @@ public class Main {
           serverSocket.setReuseAddress(true);
           // Wait for connection from client.
           clientSocket = serverSocket.accept();
-          System.out.println("Connected with Client");
+          System.out.printf("Connected with Client");
           readMultiplePingsFromSameConnection(clientSocket);
         }
         catch (IOException e) {
@@ -36,15 +36,16 @@ public class Main {
 
     private static void readMultiplePingsFromSameConnection(Socket clientSocket)  {
       try {
+
           BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
           PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
           String line;
           while ((line = br.readLine()) != null) {
-              System.out.println("send response of ping");
+              System.out.printf("send response of ping");
               if (line.equalsIgnoreCase("PING")) {
                   outputStream.print("+PONG\r\n");
                   outputStream.flush();
-                  System.out.println("Received PONG from client!");
+                  System.out.printf("Received PONG from client!");
               }
           }
       }catch (IOException e){
