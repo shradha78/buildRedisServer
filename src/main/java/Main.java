@@ -40,7 +40,7 @@ public class Main {
           PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
           String line;
           while ((line = br.readLine()) != null) {
-              System.out.printf("send response of ping \n");
+              System.out.printf("Received: %s\n", line);
               if (line.equalsIgnoreCase("PING")) {
                   outputStream.print("+PONG\r\n");
                   outputStream.flush();
