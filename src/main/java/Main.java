@@ -35,9 +35,11 @@ public class Main {
   }
 
     private static void readMultiplePingsFromSameConnection(Socket clientSocket)  throws IOException{
+      BufferedReader br = null;
+      PrintWriter outputStream = null;
       try {
-          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-          PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
+          br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+          outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
           String line;
           while ((line = br.readLine()) != null) {
               System.out.printf("Received: %s\n", line);
