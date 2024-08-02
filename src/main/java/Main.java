@@ -22,16 +22,7 @@ public class Main {
           // Wait for connection from client.
           clientSocket = serverSocket.accept();
           System.out.println("Connected with Client");
-          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-          OutputStream outputStream = clientSocket.getOutputStream();
-          String line;
-          while((line = br.readLine()) != null){
-              System.out.println("send response of ping");
-              if(line.equals("PING")) {
-                  outputStream.write("+PONG\r\n".getBytes());
-                  System.out.println("Received PONG from client!");
-              }
-          }
+          readMultiplePingsFromSameConnection(clientSocket);
         }
         catch (IOException e) {
           System.out.println("IOException: " + e.getMessage());
@@ -45,4 +36,21 @@ public class Main {
           }
         }
   }
+
+    private static void readMultiplePingsFromSameConnection(Socket clientSocket) throws IOException {
+      try {
+          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+          OutputStream outputStream = clientSocket.getOutputStream();
+          String line;
+          while ((line = br.readLine()) != null) {
+              System.out.println("send response of ping");
+              if (line.equals("PING")) {
+                  outputStream.write("+PONG\r\n".getBytes());
+                  System.out.println("Received PONG from client!");
+              }
+          }
+      }catch (RuntimeException re){
+          System.out.println("Exception is " + re.getMessage()  + "\n" + re.getStackTrace() );
+      }
+    }
 }
