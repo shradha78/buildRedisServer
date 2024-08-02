@@ -34,7 +34,7 @@ public class Main {
         }
   }
 
-    private static void readMultiplePingsFromSameConnection(Socket clientSocket) throws IOException {
+    private static void readMultiplePingsFromSameConnection(Socket clientSocket)  {
       try {
           BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
           PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
@@ -47,8 +47,8 @@ public class Main {
                   System.out.println("Received PONG from client!");
               }
           }
-      }catch (IOException re){
-          System.out.println("Exception is " + re.getMessage()  + "\n" + re.getStackTrace() );
+      }catch (IOException e){
+          throw new RuntimeException(e);
       }
     }
 }
