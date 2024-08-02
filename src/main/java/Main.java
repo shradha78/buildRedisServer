@@ -34,7 +34,7 @@ public class Main {
         }
   }
 
-    private static void readMultiplePingsFromSameConnection(Socket clientSocket)  {
+    private static void readMultiplePingsFromSameConnection(Socket clientSocket)  throws IOException{
 //      try {
 //
 //          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -52,24 +52,14 @@ public class Main {
 //          throw new RuntimeException(e);
 //      }
 //    }
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(clientSocket.getInputStream()));
-             BufferedWriter writer = new BufferedWriter(
-                     new OutputStreamWriter(clientSocket.getOutputStream()));) {
-            String content;
-            while ((content = reader.readLine()) != null) {
-                System.out.println("::" + content);
-                System.out.printf("send response of ping \n");
-                if ("ping".equalsIgnoreCase(content)) {
-                    writer.write("+PONG\r\n");
-                    writer.flush();
-                    System.out.printf("Received PONG from client! \n");
-                } else if ("eof".equalsIgnoreCase(content)) {
-                    System.out.println("eof");
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(clientSocket.getInputStream()))) {
+                String userInput;
+                while ((userInput = in.readLine()) != null) {
+                    if (userInput.equals("PING")) {
+                        clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+                    }
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
-    }
 }
