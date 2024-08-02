@@ -18,7 +18,7 @@ public class Main {
           serverSocket.setReuseAddress(true);
           // Wait for connection from client.
           clientSocket = serverSocket.accept();
-          System.out.printf("Connected with Client");
+          System.out.printf("Connected with Client \n");
           readMultiplePingsFromSameConnection(clientSocket);
         }
         catch (IOException e) {
@@ -41,11 +41,11 @@ public class Main {
           PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
           String line;
           while ((line = br.readLine()) != null) {
-              System.out.printf("send response of ping");
-              if (line.equalsIgnoreCase("PING")) {
+              System.out.printf("send response of ping \n");
+              if (line.startsWith("*1") && br.readLine().equals("$4") && line.equalsIgnoreCase("PING")) {
                   outputStream.print("+PONG\r\n");
                   outputStream.flush();
-                  System.out.printf("Received PONG from client!");
+                  System.out.printf("Received PONG from client! \n");
               }
           }
       }catch (IOException e){
