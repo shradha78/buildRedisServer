@@ -26,7 +26,7 @@ public class Main {
           OutputStream outputStream = clientSocket.getOutputStream();
           String line;
           while((line = br.readLine()) != null){
-              //send response of ping
+              System.out.println("send response of ping");
               if(line.equals("PING")) {
                   outputStream.write("+PONG\r\n".getBytes());
                   System.out.println("Received PONG from client!");
