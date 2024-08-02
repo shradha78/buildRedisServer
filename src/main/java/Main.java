@@ -41,7 +41,7 @@ public class Main {
           String line;
           while ((line = br.readLine()) != null) {
               System.out.println("send response of ping");
-              if (line.equals("PING")) {
+              if (line.equalsIgnoreCase("PING")) {
                   outputStream.print("+PONG\r\n");
                   outputStream.flush();
                   System.out.println("Received PONG from client!");
