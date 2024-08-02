@@ -35,21 +35,41 @@ public class Main {
   }
 
     private static void readMultiplePingsFromSameConnection(Socket clientSocket)  {
-      try {
-
-          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-          PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
-          String line;
-          while ((line = br.readLine()) != null) {
-              System.out.printf("send response of ping \n");
-              if (line.startsWith("*1") && br.readLine().equals("$4") && line.equalsIgnoreCase("PING")) {
-                  outputStream.print("+PONG\r\n");
-                  outputStream.flush();
-                  System.out.printf("Received PONG from client! \n");
-              }
-          }
-      }catch (IOException e){
-          throw new RuntimeException(e);
-      }
+//      try {
+//
+//          BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//          PrintWriter outputStream = new PrintWriter(clientSocket.getOutputStream(),true);
+//          String line;
+//          while ((line = br.readLine()) != null) {
+//              System.out.printf("send response of ping \n");
+//              if (line.startsWith("*1") && br.readLine().equals("$4") && line.equalsIgnoreCase("PING")) {
+//                  outputStream.print("+PONG\r\n");
+//                  outputStream.flush();
+//                  System.out.printf("Received PONG from client! \n");
+//              }
+//          }
+//      }catch (IOException e){
+//          throw new RuntimeException(e);
+//      }
+//    }
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(clientSocket.getInputStream()));
+             BufferedWriter writer = new BufferedWriter(
+                     new OutputStreamWriter(clientSocket.getOutputStream()));) {
+            String content;
+            while ((content = reader.readLine()) != null) {
+                System.out.println("::" + content);
+                System.out.printf("send response of ping \n");
+                if ("ping".equalsIgnoreCase(content)) {
+                    writer.write("+PONG\r\n");
+                    writer.flush();
+                    System.out.printf("Received PONG from client! \n");
+                } else if ("eof".equalsIgnoreCase(content)) {
+                    System.out.println("eof");
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
