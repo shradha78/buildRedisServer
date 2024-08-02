@@ -13,21 +13,16 @@ public class Main {
         Socket clientSocket = null;
         int port = 6379;
         try {
-          serverSocket = new ServerSocket(port);
-          // Since the tester restarts your program quite often, setting SO_REUSEADDR
-          // ensures that we don't run into 'Address already in use' errors
-          serverSocket.setReuseAddress(true);
-          // Wait for connection from client.
-          clientSocket = serverSocket.accept();
-          System.out.printf("Connected with Client \n" + clientSocket.getPort());
-            Socket finalClientSocket = clientSocket;
-            new Thread(()->{
-                try {
-                    readMultiplePingsFromSameConnection(finalClientSocket);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            serverSocket = new ServerSocket(port);
+            // Since the tester restarts your program quite often, setting SO_REUSEADDR
+            // ensures that we don't run into 'Address already in use' errors
+            serverSocket.setReuseAddress(true);
+            // Wait for connection from client.
+            clientSocket = serverSocket.accept();
+//            clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+//            System.out.println("Received PONG from client!");
+            System.out.printf("Connected with Client \n" + clientSocket.getPort());
+            readMultiplePingsFromSameConnection(clientSocket);
         }
         catch (IOException e) {
           System.out.println("IOException: " + e.getMessage());
@@ -43,22 +38,16 @@ public class Main {
   }
 
     private static void readMultiplePingsFromSameConnection(Socket clientSocket)  throws IOException{
-      BufferedReader br = null;
-      OutputStream output = null;
-      try {
-          br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-          output = clientSocket.getOutputStream();
-          String line;
-          while ((line = br.readLine()) != null) {
-              System.out.printf("Received: %s\n", line);
-              if (line.equalsIgnoreCase("PING")) {
-                  output.write("+PONG\r\n".getBytes(StandardCharsets.UTF_8) );
-                  output.flush();
-                  System.out.printf("Received PONG from client! \n");
-              }
-          }
-      }catch (IOException e){
-          throw new RuntimeException(e);
-      }
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(clientSocket.getInputStream()));
+        OutputStream outputStream = clientSocket.getOutputStream();
+        String line;
+        while ((line = br.readLine()) != null) {
+            System.out.printf("send response of ping : " + line + "\n");
+            if (line.equalsIgnoreCase("PING")) {
+                outputStream.write("+PONG\r\n".getBytes());
+                System.out.println("Received PONG from client!");
+            }
+        }
     }
 }
