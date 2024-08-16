@@ -102,7 +102,7 @@ public class Main {
     }
 
     private static void processCommand(RedisCommand command, OutputStream outputStream) throws IOException {
-      String commandName = command.getCommand();
+      String commandName = command.getCommand().toUpperCase();
         switch (commandName) {
             case "ECHO":
                 if (command.getListOfActions().size() != 1) {
