@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RedisProtocolParser {
-    public List<String> parseRESPTypeArrayMessage(BufferedReader br) throws IOException {
+    public List<String> parseRESPMessage(BufferedReader br) throws IOException {
         List<String> mainMessageParts = new ArrayList<>();
 
         String line = br.readLine();
