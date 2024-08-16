@@ -37,7 +37,6 @@ public class Main {
                 new Thread(() -> {
                 System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
                     try {
-                       // readMultiplePingsFromSameConnection(finalClientSocket);
                         handlingClientCommands(finalClientSocket);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -56,29 +55,6 @@ public class Main {
           }
         }
     }
-
-    private static void readMultiplePingsFromSameConnection(Socket clientSocket)  throws IOException{
-      try {
-          BufferedReader br = new BufferedReader(
-                  new InputStreamReader(clientSocket.getInputStream()));
-          OutputStream outputStream = clientSocket.getOutputStream();
-          String line;
-          while ((line = br.readLine()) != null) {
-              System.out.printf("send response of ping : " + line + "\n");
-              if (line.equalsIgnoreCase("PING")) {
-                  outputStream.write("+PONG\r\n".getBytes());
-                  System.out.println("Received PONG from client!");
-              } else if ("eof".equalsIgnoreCase(line)) {
-                  System.out.printf("eof");
-              }
-          }
-      }catch (IOException e) {
-          e.printStackTrace();
-      }finally {
-          clientSocket.close();
-      }
-    }
-
     private static void handlingClientCommands(Socket clientSocket)  throws IOException{
         try {
             BufferedReader br = new BufferedReader(
@@ -87,8 +63,8 @@ public class Main {
             while(true){
                 try{
                     List<String> messageParts = redisProtocolParser.parseRESPTypeArrayMessage(br);
-                    RedisCommand command = redisCommandParser.parseCommand(messageParts);
-                    processCommand(command,outputStream);
+                    RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
+                    processCommand(command,outputStream);//based on commands, it will process output
                 }catch (IOException e){
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                     break;
@@ -110,13 +86,13 @@ public class Main {
                 } else {
                     String response = command.getListOfActions().get(0);
                     String respBulkString = "$" + response.length() + "\r\n" + response + "\r\n";
-                    System.out.printf("Response Bulk String is : " + respBulkString);
+                    System.out.printf("Response Bulk String is : " + respBulkString.getBytes() +"\n");
                     outputStream.write(respBulkString.getBytes());
                 }
                 break;
             case "PING":
                     outputStream.write("+PONG\r\n".getBytes());
-                    System.out.printf("Received PONG from client!");
+                    System.out.printf("Received PONG from client! \n");
                 break;
             default:
                 outputStream.write("-ERR unknown command\r\n".getBytes());
