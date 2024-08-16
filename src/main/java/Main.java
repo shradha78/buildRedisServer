@@ -37,7 +37,7 @@ public class Main {
                 new Thread(() -> {
                 System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
                     try {
-                        readMultiplePingsFromSameConnection(finalClientSocket);
+                       // readMultiplePingsFromSameConnection(finalClientSocket);
                         handlingClientCommands(finalClientSocket);
                     } catch (IOException e) {
                         e.printStackTrace();
