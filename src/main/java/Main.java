@@ -114,7 +114,10 @@ public class Main {
                     outputStream.write(respBulkString.getBytes());
                 }
                 break;
-
+            case "PING":
+                    outputStream.write("+PONG\r\n".getBytes());
+                    System.out.printf("Received PONG from client!");
+                break;
             default:
                 outputStream.write("-ERR unknown command\r\n".getBytes());
                 break;
