@@ -8,14 +8,14 @@ public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
-  public static void main(String[] args){
+    public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         int port = 6379;
        listenToPort(clientSocket, port);
-  }
+    }
 
     private static void listenToPort(Socket clientSocket, int port) {
         ServerSocket serverSocket;
@@ -115,7 +115,21 @@ public class Main {
                    storeKeyValue.put(setKey,new KeyValue(setValue, expiryTime));
                    sendSimpleOKResponse(outputStream);
                 break;
-
+            case "INCR":
+                 String keyIncr = command.getListOfActions().get(0);
+                 KeyValue keyValueIncr = storeKeyValue.get(keyIncr);
+                 String value = keyValueIncr.getValue();
+                 int valueIncr = 0;
+                 try {
+                     valueIncr = Integer.parseInt(value);
+                     valueIncr += 1;
+                 }catch(NumberFormatException numberFormatException){
+                     sendErrorResponse(outputStream, "Value is not an integer");
+                     return;
+                 }
+                 storeKeyValue.put(keyIncr, (new KeyValue(String.valueOf(valueIncr),0)));
+                 sendIntegerResponse(outputStream, String.valueOf(valueIncr),"Integer value is ");
+                break;
             default:
                 sendErrorResponse(outputStream,"Unknown Command");
                 break;
@@ -139,6 +153,11 @@ public class Main {
         String responseBulkString = "$" + value.length() + "\r\n" + value + "\r\n";
         System.out.printf(debugPrintStatement + responseBulkString + "\n");
         outputStream.write(responseBulkString.getBytes());
+    }
+    private static void sendIntegerResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
+        String responseInteger = ":" + value + "\r\n";
+        System.out.printf(debugPrintStatement + responseInteger + "\n");
+        outputStream.write(responseInteger.getBytes());
     }
 
 }
