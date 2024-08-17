@@ -109,7 +109,7 @@ public class Main {
                   if (command.getListOfActions().size() > 2
                           && command.getListOfActions().get(2).equalsIgnoreCase("PX")) {
                     int seconds = Integer.parseInt(command.getListOfActions().get(3));
-                    expiryTime = System.currentTimeMillis() + seconds * 1000; //storing future expiry time
+                    expiryTime = System.currentTimeMillis() + seconds; //storing future expiry time
                     System.out.printf("Expiry time is  " + expiryTime + "\n");
                    }
                    storeKeyValue.put(setKey,new KeyValue(setValue, expiryTime));
