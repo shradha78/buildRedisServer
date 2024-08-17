@@ -1,3 +1,7 @@
+package RedisServer;
+
+import RedisServer.RedisCommand;
+
 import java.util.List;
 
 public class RedisCommandParser {

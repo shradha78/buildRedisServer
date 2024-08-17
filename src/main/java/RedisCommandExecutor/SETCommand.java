@@ -1,0 +1,27 @@
+package RedisCommandExecutor;
+
+import RedisServer.KeyValue;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+
+public class SETCommand implements IRedisCommandHandler{
+    @Override
+    public void execute(List<String> args, OutputStream outputStream) throws IOException {
+        String setKey = args.get(0);
+        String setValue = args.get(1);
+        long expiryTime = 0;
+        if (args.size() > 2
+                && args.get(2).equalsIgnoreCase("PX")) {
+            int seconds = Integer.parseInt(args.get(3));
+            expiryTime = System.currentTimeMillis() + seconds; //storing future expiry time
+            System.out.printf("Expiry time is  " + expiryTime + "\n");
+        }
+        RedisServer.Main.storeKeyValue.put(setKey,new RedisServer.KeyValue(setValue, expiryTime));
+        sendSimpleOKResponse(outputStream);
+    }
+    public static void sendSimpleOKResponse(OutputStream outputStream) throws IOException {
+        outputStream.write("+OK\r\n".getBytes());
+    }
+}
