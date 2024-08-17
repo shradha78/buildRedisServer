@@ -96,6 +96,7 @@ public class Main {
                     String key = command.getListOfActions().get(0);
                     KeyValue keyValue = storeKeyValue.get(key);
                     if (keyValue == null || keyValue.isExpired()) {
+                        storeKeyValue.remove(key);
                         sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");
                     } else {
                         sendBulkStringResponse(outputStream, keyValue.getValue(), "Response for GET ");
