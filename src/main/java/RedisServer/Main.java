@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
+
 public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
@@ -86,9 +88,10 @@ public class Main {
 
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommand(command.getCommand());
         if (redisCommandHandler != null) {
+            System.out.printf("command is : " + command.getCommand());
             redisCommandHandler.execute(command.getListOfActions(), outputStream);
         } else {
-            sendErrorResponse(outputStream, "Unknown Command");
+            sendErrorResponse(outputStream, " Unknown Command");
         }
 //        switch (commandName) {
 //            case "ECHO":
@@ -147,28 +150,28 @@ public class Main {
 //        }
     }
 
-    public static void sendErrorResponse(OutputStream outputStream, String message) throws IOException {
-        outputStream.write(("-ERR" +  message + "\r\n").getBytes());
-    }
-
-    public static void sendSimpleOKResponse(OutputStream outputStream) throws IOException {
-      outputStream.write("+OK\r\n".getBytes());
-    }
-
-    public static void sendBulkStringResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
-        if(value.equals("")){
-            String responseBulkNullString = "$-1\r\n";
-            outputStream.write(responseBulkNullString.getBytes());
-            return;
-        }
-        String responseBulkString = "$" + value.length() + "\r\n" + value + "\r\n";
-        System.out.printf(debugPrintStatement + responseBulkString + "\n");
-        outputStream.write(responseBulkString.getBytes());
-    }
-    private static void sendIntegerResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
-        String responseInteger = ":" + value + "\r\n";
-        System.out.printf(debugPrintStatement + responseInteger + "\n");
-        outputStream.write(responseInteger.getBytes());
-    }
+//    public static void sendErrorResponse(OutputStream outputStream, String message) throws IOException {
+//        outputStream.write(("-ERR" +  message + "\r\n").getBytes());
+//    }
+//
+//    public static void sendSimpleOKResponse(OutputStream outputStream) throws IOException {
+//      outputStream.write("+OK\r\n".getBytes());
+//    }
+//
+//    public static void sendBulkStringResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
+//        if(value.equals("")){
+//            String responseBulkNullString = "$-1\r\n";
+//            outputStream.write(responseBulkNullString.getBytes());
+//            return;
+//        }
+//        String responseBulkString = "$" + value.length() + "\r\n" + value + "\r\n";
+//        System.out.printf(debugPrintStatement + responseBulkString + "\n");
+//        outputStream.write(responseBulkString.getBytes());
+//    }
+//    private static void sendIntegerResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
+//        String responseInteger = ":" + value + "\r\n";
+//        System.out.printf(debugPrintStatement + responseInteger + "\n");
+//        outputStream.write(responseInteger.getBytes());
+//    }
 
 }

@@ -9,6 +9,7 @@ import java.util.List;
 public class SETCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream) throws IOException {
+        System.out.printf("In class SET Command ");
         String setKey = args.get(0);
         String setValue = args.get(1);
         long expiryTime = 0;

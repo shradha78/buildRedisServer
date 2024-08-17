@@ -19,6 +19,7 @@ public class CommandFactory {
         if(!commands.containsKey(commandName.toUpperCase())){
             return null;
         }
+        System.out.printf("In Command Factory, Command Received is :  " + commandName );
         return commands.get(commandName.toUpperCase());
     }
 }

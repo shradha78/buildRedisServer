@@ -10,7 +10,9 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 public class GETCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream) throws IOException {
-        String key =args.get(0);
+        System.out.printf("In class GETCommand");
+        String key = args.get(0);
+        System.out.printf("Key here is : " + key);
         RedisServer.KeyValue keyValue = RedisServer.Main.storeKeyValue.get(key);
         if (keyValue == null || keyValue.isExpired()) {
             RedisServer.Main.storeKeyValue.remove(key);
