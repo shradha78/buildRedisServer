@@ -117,12 +117,12 @@ public class Main {
                 break;
             case "INCR":
                  String keyIncr = command.getListOfActions().get(0);
-                 KeyValue keyValueIncr = storeKeyValue.get(keyIncr);
+                 KeyValue keyValueIncr = storeKeyValue.containsKey(keyIncr) ? storeKeyValue.get(keyIncr) : new KeyValue("0",0);
                  String value = keyValueIncr.getValue();
                  int valueIncr = 0;
                  try {
                      valueIncr = Integer.parseInt(value);
-                     valueIncr += 1; //for stage 2 of INCR
+                     valueIncr += 1;
                  }catch(NumberFormatException numberFormatException){
                      sendErrorResponse(outputStream, "Value is not an integer");
                      return;
