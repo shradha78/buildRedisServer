@@ -122,7 +122,7 @@ public class Main {
                  int valueIncr = 0;
                  try {
                      valueIncr = Integer.parseInt(value);
-                     valueIncr += 1;
+                     valueIncr += 1; //for stage 2 of INCR
                  }catch(NumberFormatException numberFormatException){
                      sendErrorResponse(outputStream, "Value is not an integer");
                      return;
