@@ -1,18 +1,16 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
-    public static HashMap<String, String> storeKeyValue;
+    public static HashMap<String, KeyValue> storeKeyValue;
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-
-     // Uncomment this block to pass the first stage
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         int port = 6379;
@@ -96,13 +94,24 @@ public class Main {
                 break;
             case "GET":
                     String key = command.getListOfActions().get(0);
-                    String value = storeKeyValue.getOrDefault(key,"");
-                    sendBulkStringResponse(outputStream, value, "Response for GET ");
+                    KeyValue keyValue = storeKeyValue.get(key);
+                    if (keyValue == null || keyValue.isExpired()) {
+                        sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");
+                    } else {
+                        sendBulkStringResponse(outputStream, keyValue.getValue(), "Response for GET ");
+                    }
                 break;
             case "SET":
                    String setKey = command.getListOfActions().get(0);
                    String setValue = command.getListOfActions().get(1);
-                   storeKeyValue.put(setKey,setValue);
+                   long expiryTime = 0;
+                  if (command.getListOfActions().size() > 2){
+//                          && command.getListOfActions().get(2).equalsIgnoreCase("PX")) {
+                    int seconds = Integer.parseInt(command.getListOfActions().get(2));
+                    expiryTime = System.currentTimeMillis() + seconds * 1000; //storing future expiry time
+                    System.out.printf("Expiry time is  " + expiryTime + "\n");
+                   }
+                   storeKeyValue.put(setKey,new KeyValue(setValue, expiryTime));
                    sendSimpleOKResponse(outputStream);
                 break;
 
