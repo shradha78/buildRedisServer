@@ -89,6 +89,7 @@ public class Main {
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommand(command.getCommand());
         if (redisCommandHandler != null) {
             System.out.printf("command is : " + command.getCommand());
+            System.out.printf("Arguments: " + command.getListOfActions() + "\n");
             redisCommandHandler.execute(command.getListOfActions(), outputStream);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");

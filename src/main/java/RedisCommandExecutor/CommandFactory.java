@@ -10,8 +10,8 @@ public class CommandFactory {
         commands.put("ECHO", new EchoCommand());
         commands.put("GET", new GETCommand());
         commands.put("SET", new SETCommand());
-        commands.put("PING", new SETCommand());
-        commands.put("INCR", new SETCommand());
+        commands.put("PING", new PingCommand());
+        commands.put("INCR", new IncrCommand());
 
     }
 
