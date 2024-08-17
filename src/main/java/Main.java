@@ -106,7 +106,7 @@ public class Main {
                    String setValue = command.getListOfActions().get(1);
                    long expiryTime = 0;
                   if (command.getListOfActions().size() > 2){
-//                          && command.getListOfActions().get(2).equalsIgnoreCase("PX")) {
+                          && command.getListOfActions().get(2).equalsIgnoreCase("PX")) {
                     int seconds = Integer.parseInt(command.getListOfActions().get(2));
                     expiryTime = System.currentTimeMillis() + seconds * 1000; //storing future expiry time
                     System.out.printf("Expiry time is  " + expiryTime + "\n");
