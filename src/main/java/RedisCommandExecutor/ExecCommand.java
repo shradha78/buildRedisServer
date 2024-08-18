@@ -14,6 +14,9 @@ public class ExecCommand implements IRedisCommandHandler {
         if (!Main.queueOfCommandsForMultiAndExec.isEmpty() && !Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")) {
             sendErrorResponse(outputStream, "EXEC without MULTI");
         } else {
+            if(!Main.queueOfCommandsForMultiAndExec.isEmpty() &&Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI") ){
+                Main.queueOfCommandsForMultiAndExec.poll();
+            }
             sendEmptyArrayResponse(outputStream,"0", "Empty array response is : ");
         }
     }
