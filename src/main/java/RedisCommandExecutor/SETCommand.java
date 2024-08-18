@@ -10,6 +10,9 @@ public class SETCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream) throws IOException {
         System.out.printf("In class SETCommand ");
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+            return;
+        }
         String setKey = args.get(0);
         String setValue = args.get(1);
         System.out.printf("Key to set : " + setKey);
@@ -21,9 +24,6 @@ public class SETCommand implements IRedisCommandHandler{
             System.out.printf("Expiry time is  " + expiryTime + "\n");
         }
         RedisServer.Main.storeKeyValue.put(setKey,new RedisServer.KeyValue(setValue, expiryTime));
-        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
-            return;
-        }
         sendSimpleOKResponse(outputStream);
     }
     public static void sendSimpleOKResponse(OutputStream outputStream) throws IOException {

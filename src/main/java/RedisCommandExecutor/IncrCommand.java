@@ -9,6 +9,10 @@ import java.util.List;
 public class IncrCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream) throws IOException {
+        System.out.printf("In Incr class \n");
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+            return;
+        }
         String keyIncr = args.get(0);
         KeyValue keyValueIncr = RedisServer.Main.storeKeyValue.containsKey(keyIncr) ?
                                     RedisServer.Main.storeKeyValue.get(keyIncr) : new KeyValue("0",0);
@@ -22,9 +26,6 @@ public class IncrCommand implements IRedisCommandHandler{
             return;
         }
         RedisServer.Main.storeKeyValue.put(keyIncr, (new RedisServer.KeyValue(String.valueOf(valueIncr),0)));
-        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
-            return;
-        }
         sendIntegerResponse(outputStream, String.valueOf(valueIncr),"Integer value is ");
     }
 
