@@ -71,9 +71,9 @@ public class Main {
                 try{
                     System.out.printf("Going to RESP parser ");
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
-                    System.out.printf("Going to command Parser ");
+                    System.out.printf("Going to command Parser \n");
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
-                    System.out.printf("Going to process command method ");
+                    System.out.printf("Going to process command method \n");
                     processCommand(command,outputStream);//based on commands, it will process output
                 }catch (IOException e){
                     outputStream.write("-ERR invalid input\r\n".getBytes());
@@ -88,8 +88,9 @@ public class Main {
     }
 
     private static void processCommand(RedisCommand command, OutputStream outputStream) throws IOException {
-        System.out.printf("In Processing Command");
+        System.out.printf("In Processing Command \n");
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
+        System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() +"\n");
         if (redisCommandHandler != null) {
             System.out.printf("command is : " + command.getCommand());
             System.out.printf("Arguments: " + command.getListOfActions() + "\n");
