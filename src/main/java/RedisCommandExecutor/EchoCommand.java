@@ -10,6 +10,9 @@ public class EchoCommand implements IRedisCommandHandler{
         if (commandArgs.size() != 1) {
             outputStream.write("-ERR wrong number of arguments for 'ECHO' command\r\n".getBytes());
         } else {
+            if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+                return;
+            }
             String response = commandArgs.get(0);
             sendBulkStringResponse(outputStream, response, "Response Bulk String is : ");
         }

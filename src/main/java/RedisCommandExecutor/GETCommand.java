@@ -14,6 +14,9 @@ public class GETCommand implements IRedisCommandHandler{
         String key = args.get(0);
         System.out.printf("Key here is : " + key);
         RedisServer.KeyValue keyValue = RedisServer.Main.storeKeyValue.get(key);
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+            return;
+        }
         if (keyValue == null || keyValue.isExpired()) {
             RedisServer.Main.storeKeyValue.remove(key);
             sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");

@@ -1,6 +1,7 @@
 package RedisCommandExecutor;
 
 import RedisServer.Main;
+import RedisServer.RedisCommand;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,8 +15,16 @@ public class ExecCommand implements IRedisCommandHandler {
         if (!Main.queueOfCommandsForMultiAndExec.isEmpty() && !Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")) {
             sendErrorResponse(outputStream, "EXEC without MULTI");
         } else {
-            if(!Main.queueOfCommandsForMultiAndExec.isEmpty() &&Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI") ){
+            if(!Main.queueOfCommandsForMultiAndExec.isEmpty() && Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI") ){
                 Main.queueOfCommandsForMultiAndExec.poll();
+                int count = 1;
+                while(!Main.queueOfCommandsForMultiAndExec.isEmpty()){
+                    RedisCommand redisCommand = Main.queueOfCommandsForMultiAndExec.poll();
+                    if(redisCommand.getCommand().equals("EXEC")){
+                        return;
+                    }
+                    RedisServer.Main.processCommand(redisCommand,outputStream);
+                }
             }
             sendEmptyArrayResponse(outputStream,"0", "Empty array response is : ");
         }

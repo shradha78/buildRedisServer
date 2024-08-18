@@ -22,6 +22,9 @@ public class IncrCommand implements IRedisCommandHandler{
             return;
         }
         RedisServer.Main.storeKeyValue.put(keyIncr, (new RedisServer.KeyValue(String.valueOf(valueIncr),0)));
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+            return;
+        }
         sendIntegerResponse(outputStream, String.valueOf(valueIncr),"Integer value is ");
     }
 

@@ -75,6 +75,8 @@ public class Main {
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
                     System.out.printf("Going to command Parser \n");
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
+                    System.out.printf("Going to queuing commands \n");
+                    queuingCommands(command);
                     System.out.printf("Going to process command method \n");
                     processCommand(command,outputStream);//based on commands, it will process output
                 }catch (IOException e){
@@ -89,24 +91,30 @@ public class Main {
         }
     }
 
-    private static void processCommand(RedisCommand command, OutputStream outputStream) throws IOException {
+    public static void processCommand(RedisCommand command, OutputStream outputStream) throws IOException {
         System.out.printf("In Processing Command \n");
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
-        if(!queueOfCommandsForMultiAndExec.isEmpty()){
-            while(!queueOfCommandsForMultiAndExec.isEmpty() && !queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
-                queueOfCommandsForMultiAndExec.poll();
-            }
-        }else{
-            queueOfCommandsForMultiAndExec.add(command);
-        }
+
         System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
         if (redisCommandHandler != null) {
-           if(!queueOfCommandsForMultiAndExec.isEmpty()) System.out.printf("Command on front of queue : " + queueOfCommandsForMultiAndExec.peek().getCommand() +"\n");
             System.out.printf("command is : " + command.getCommand() +"\n");
             System.out.printf("Arguments: " + command.getListOfActions() + "\n");
             redisCommandHandler.execute(command.getListOfActions(), outputStream);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
+        }
+    }
+
+    private static void queuingCommands(RedisCommand command) {
+        System.out.printf("Processing Queue \n");
+        queueOfCommandsForMultiAndExec.add(command);
+        if(!queueOfCommandsForMultiAndExec.isEmpty()){
+            while(!queueOfCommandsForMultiAndExec.isEmpty() && !queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
+                queueOfCommandsForMultiAndExec.poll();
+            }
+        }
+        if(!queueOfCommandsForMultiAndExec.isEmpty()) {
+            System.out.printf("Command on front of queue : " + queueOfCommandsForMultiAndExec.peek().getCommand() +"\n");
         }
     }
 }
