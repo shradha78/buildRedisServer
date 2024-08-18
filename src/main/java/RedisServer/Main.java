@@ -93,7 +93,7 @@ public class Main {
         System.out.printf("In Processing Command \n");
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
         if(!queueOfCommandsForMultiAndExec.isEmpty()){
-            while(!queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
+            while(!queueOfCommandsForMultiAndExec.isEmpty() && !queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
                 queueOfCommandsForMultiAndExec.poll();
             }
         }else{
