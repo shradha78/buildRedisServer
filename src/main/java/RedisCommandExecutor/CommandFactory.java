@@ -6,7 +6,7 @@ import java.util.Map;
 public class CommandFactory {
     private static Map<String, IRedisCommandHandler> commands;
 
-    public CommandFactory() {
+   static{
         commands = new HashMap<>();
         commands.put("ECHO", new EchoCommand());
         commands.put("GET", new GETCommand());
