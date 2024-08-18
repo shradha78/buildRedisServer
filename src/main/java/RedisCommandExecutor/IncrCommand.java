@@ -26,7 +26,7 @@ public class IncrCommand implements IRedisCommandHandler{
     }
 
     public static void sendErrorResponse(OutputStream outputStream, String message) throws IOException {
-        outputStream.write(("-ERR" +  message + "\r\n").getBytes());
+        outputStream.write(("-ERR " +  message + "\r\n").getBytes());
     }
 
     private static void sendIntegerResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
