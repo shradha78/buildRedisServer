@@ -14,6 +14,7 @@ public class CommandFactory {
         commands.put("PING", new PingCommand());
         commands.put("INCR", new IncrCommand());
         commands.put("MULTI", new MultiCommand());
+        commands.put("EXEC", new ExecCommand());
 
     }
 

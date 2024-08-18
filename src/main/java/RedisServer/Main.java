@@ -15,6 +15,7 @@ public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
+    public static Queue<RedisCommand> queueOfCommandsForMultiAndExec;
     public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -29,6 +30,7 @@ public class Main {
         redisCommandParser = new RedisCommandParser();
         redisProtocolParser = new RedisProtocolParser();
         storeKeyValue = new HashMap<>();
+        queueOfCommandsForMultiAndExec = new LinkedList<>();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -90,6 +92,13 @@ public class Main {
     private static void processCommand(RedisCommand command, OutputStream outputStream) throws IOException {
         System.out.printf("In Processing Command \n");
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
+        if(!queueOfCommandsForMultiAndExec.isEmpty()){
+            while(!queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
+                queueOfCommandsForMultiAndExec.poll();
+            }
+        }else{
+            queueOfCommandsForMultiAndExec.add(command);
+        }
         System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
         if (redisCommandHandler != null) {
             System.out.printf("command is : " + command.getCommand());

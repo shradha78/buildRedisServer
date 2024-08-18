@@ -12,7 +12,7 @@ public class RedisCommandParser {
             System.out.printf("No Message parsed from RESP");
             return new RedisCommand("Unknown Command",null);
         }
-        String commandName = mainMessageParts.get(0);
+        String commandName = mainMessageParts.get(0).toUpperCase();
         System.out.printf("Command is : " + commandName + "\n");
         List<String> messageArgs = mainMessageParts.size() > 1 ?
                 mainMessageParts.subList(1, mainMessageParts.size()) : new ArrayList<>();//all remaining arguments from parsed list
