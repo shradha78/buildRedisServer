@@ -44,7 +44,8 @@ public class Main {
                 new Thread(() -> {
                 System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
                     try {
-                        handlingClientCommands(finalClientSocket);
+                        ClientSession session = new ClientSession();
+                        handlingClientCommands(finalClientSocket,session);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -62,8 +63,8 @@ public class Main {
           }
         }
     }
-    private static void handlingClientCommands(Socket clientSocket)  throws IOException{
-        ClientSession session = new ClientSession();
+    private static void handlingClientCommands(Socket clientSocket, ClientSession session)  throws IOException{
+
         try {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
