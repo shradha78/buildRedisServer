@@ -6,13 +6,14 @@ import java.util.Map;
 public class CommandFactory {
     private static Map<String, IRedisCommandHandler> commands;
 
-   static{
+   static{ //using static block instead of constructor since map is static and needs to intialised in the same instead of a constructor
         commands = new HashMap<>();
         commands.put("ECHO", new EchoCommand());
         commands.put("GET", new GETCommand());
         commands.put("SET", new SETCommand());
         commands.put("PING", new PingCommand());
         commands.put("INCR", new IncrCommand());
+        commands.put("MULTI", new MultiCommand());
 
     }
 
