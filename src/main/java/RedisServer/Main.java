@@ -107,12 +107,13 @@ public class Main {
 
     private static void queuingCommands(RedisCommand command) {
         System.out.printf("Processing Queue \n");
-        queueOfCommandsForMultiAndExec.add(command);
+
         if(!queueOfCommandsForMultiAndExec.isEmpty()){
             while(!queueOfCommandsForMultiAndExec.isEmpty() && !queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
                 queueOfCommandsForMultiAndExec.poll();
             }
         }
+        queueOfCommandsForMultiAndExec.add(command);
         if(!queueOfCommandsForMultiAndExec.isEmpty()) {
             System.out.printf("Command on front of queue : " + queueOfCommandsForMultiAndExec.peek().getCommand() +"\n");
         }
