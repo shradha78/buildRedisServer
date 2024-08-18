@@ -9,7 +9,7 @@ public class MultiCommandCheckerUtils {
     public static boolean checkForMultiCommandInQueue(OutputStream outputStream) throws IOException {
         if(!Main.queueOfCommandsForMultiAndExec.isEmpty()
         && Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
-            sendQueuedAsResponse(outputStream, "Queued");
+            sendQueuedAsResponse(outputStream, "QUEUED");
             return true;
         }
         return false;
