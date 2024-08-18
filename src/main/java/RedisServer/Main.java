@@ -101,7 +101,7 @@ public class Main {
         }
         System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
         if (redisCommandHandler != null) {
-            System.out.printf("Command on front of queue : " + queueOfCommandsForMultiAndExec.peek().getCommand() +"\n");
+           if(!queueOfCommandsForMultiAndExec.isEmpty()) System.out.printf("Command on front of queue : " + queueOfCommandsForMultiAndExec.peek().getCommand() +"\n");
             System.out.printf("command is : " + command.getCommand() +"\n");
             System.out.printf("Arguments: " + command.getListOfActions() + "\n");
             redisCommandHandler.execute(command.getListOfActions(), outputStream);
