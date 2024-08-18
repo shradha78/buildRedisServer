@@ -3,15 +3,17 @@ package RedisCommandExecutor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+
+import RedisServer.ClientSession;
 import RedisServer.Main;
 import RedisServer.KeyValue;
 import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 
 public class GETCommand implements IRedisCommandHandler{
     @Override
-    public void execute(List<String> args, OutputStream outputStream) throws IOException {
+    public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.printf("In class GETCommand \n");
-        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream,session)){
             return;
         }
         String key = args.get(0);

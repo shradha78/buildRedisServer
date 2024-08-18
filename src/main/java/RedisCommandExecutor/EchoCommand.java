@@ -1,13 +1,15 @@
 package RedisCommandExecutor;
 
+import RedisServer.ClientSession;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
 public class EchoCommand implements IRedisCommandHandler{
     @Override
-    public void execute(List<String> commandArgs, OutputStream outputStream) throws IOException {
-        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+    public void execute(List<String> commandArgs, OutputStream outputStream, ClientSession session) throws IOException {
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream,session)){
             return;
         }
         if (commandArgs.size() != 1) {

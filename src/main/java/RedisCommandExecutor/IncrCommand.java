@@ -1,5 +1,6 @@
 package RedisCommandExecutor;
 
+import RedisServer.ClientSession;
 import RedisServer.KeyValue;
 
 import java.io.IOException;
@@ -8,9 +9,9 @@ import java.util.List;
 
 public class IncrCommand implements IRedisCommandHandler{
     @Override
-    public void execute(List<String> args, OutputStream outputStream) throws IOException {
+    public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.printf("In Incr class \n");
-        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream)){
+        if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream,session)){
             return;
         }
         String keyIncr = args.get(0);

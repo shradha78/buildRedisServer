@@ -15,7 +15,6 @@ public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
-    public static Queue<RedisCommand> queueOfCommandsForMultiAndExec;
     public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -30,7 +29,6 @@ public class Main {
         redisCommandParser = new RedisCommandParser();
         redisProtocolParser = new RedisProtocolParser();
         storeKeyValue = new HashMap<>();
-        queueOfCommandsForMultiAndExec = new LinkedList<>();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -65,6 +63,7 @@ public class Main {
         }
     }
     private static void handlingClientCommands(Socket clientSocket)  throws IOException{
+        ClientSession session = new ClientSession();
         try {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
@@ -76,9 +75,9 @@ public class Main {
                     System.out.printf("Going to command Parser \n");
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
                     System.out.printf("Going to queuing commands \n");
-                    queuingCommands(command);
+                    queueCommands(command,session);
                     System.out.printf("Going to process command method \n");
-                    processCommand(command,outputStream);//based on commands, it will process output
+                    processCommand(command,outputStream,session);//based on commands, it will process output
                 }catch (IOException e){
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                     break;
@@ -91,7 +90,7 @@ public class Main {
         }
     }
 
-    public static void processCommand(RedisCommand command, OutputStream outputStream) throws IOException {
+    public static void processCommand(RedisCommand command, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.printf("In Processing Command \n");
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
 
@@ -99,23 +98,25 @@ public class Main {
         if (redisCommandHandler != null) {
             System.out.printf("command is : " + command.getCommand() +"\n");
             System.out.printf("Arguments: " + command.getListOfActions() + "\n");
-            redisCommandHandler.execute(command.getListOfActions(), outputStream);
+            redisCommandHandler.execute(command.getListOfActions(), outputStream,session);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
         }
     }
 
-    private static void queuingCommands(RedisCommand command) {
-        System.out.printf("Processing Queue \n");
+    private static void queueCommands(RedisCommand command, ClientSession session) {
+        System.out.println("Processing Queue");
 
-        if(!queueOfCommandsForMultiAndExec.isEmpty()){
-            while(!queueOfCommandsForMultiAndExec.isEmpty() && !queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
+        Queue<RedisCommand> queueOfCommandsForMultiAndExec = session.getCommandQueue();
+
+        if (!queueOfCommandsForMultiAndExec.isEmpty()) {
+            while (!queueOfCommandsForMultiAndExec.isEmpty() && !queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")) {
                 queueOfCommandsForMultiAndExec.poll();
             }
         }
         queueOfCommandsForMultiAndExec.add(command);
-        if(!queueOfCommandsForMultiAndExec.isEmpty()) {
-            System.out.printf("Command on front of queue : " + queueOfCommandsForMultiAndExec.peek().getCommand() +"\n");
+        if (!queueOfCommandsForMultiAndExec.isEmpty()) {
+            System.out.println("Command on front of queue: " + queueOfCommandsForMultiAndExec.peek().getCommand());
         }
     }
 }

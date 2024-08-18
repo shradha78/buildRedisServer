@@ -1,5 +1,6 @@
 package RedisCommandExecutor;
 
+import RedisServer.ClientSession;
 import RedisServer.Main;
 import RedisServer.RedisCommand;
 
@@ -11,19 +12,19 @@ import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
 
 public class ExecCommand implements IRedisCommandHandler {
     @Override
-    public void execute(List<String> args, OutputStream outputStream) throws IOException {
-        if (!Main.queueOfCommandsForMultiAndExec.isEmpty() && !Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")) {
+    public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
+        if (!session.getCommandQueue().isEmpty() && !session.getCommandQueue().peek().getCommand().equals("MULTI")) {
             sendErrorResponse(outputStream, "EXEC without MULTI");
         } else {
-            if(!Main.queueOfCommandsForMultiAndExec.isEmpty() && Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI") ){
-                Main.queueOfCommandsForMultiAndExec.poll();
+            if(!session.getCommandQueue().isEmpty() && session.getCommandQueue().peek().getCommand().equals("MULTI") ){
+                session.getCommandQueue().poll();
                 int count = 1;
-                while(!Main.queueOfCommandsForMultiAndExec.isEmpty()){
-                    RedisCommand redisCommand = Main.queueOfCommandsForMultiAndExec.poll();
+                while(!session.getCommandQueue().isEmpty()){
+                    RedisCommand redisCommand = session.getCommandQueue().poll();
                     if(redisCommand.getCommand().equals("EXEC")){
                         return;
                     }
-                    RedisServer.Main.processCommand(redisCommand,outputStream);
+                    RedisServer.Main.processCommand(redisCommand,outputStream,session);
                 }
             }
             sendEmptyArrayResponse(outputStream,"0", "Empty array response is : ");
