@@ -11,7 +11,7 @@ import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
 public class ExecCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream) throws IOException {
-            if(!Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
+            if(!Main.queueOfCommandsForMultiAndExec.isEmpty() && !Main.queueOfCommandsForMultiAndExec.peek().getCommand().equals("MULTI")){
                 sendErrorResponse(outputStream,"EXEC without MULTI");
             }
     }
