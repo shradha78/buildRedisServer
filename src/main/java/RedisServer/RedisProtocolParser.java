@@ -21,6 +21,9 @@ public class RedisProtocolParser {
             System.out.printf("The Argument are : " + message + "\n");
             mainMessageParts.add(message); //will contain command and message string
         }
+        for(int i = 0; i < mainMessageParts.size();i++){
+            System.out.printf("Main Message Parts : "  + mainMessageParts.get(i) + "\n");
+        }
         return mainMessageParts;
     }
 }

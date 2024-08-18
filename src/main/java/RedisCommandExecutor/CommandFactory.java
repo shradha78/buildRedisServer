@@ -15,11 +15,12 @@ public class CommandFactory {
 
     }
 
-    public static IRedisCommandHandler getCommand(String commandName) {
+    public static IRedisCommandHandler getCommandFromAvailableCommands(String commandName) {
+        System.out.printf("In Command Factory, Command Received is :  " + commandName );
         if(!commands.containsKey(commandName.toUpperCase())){
             return null;
         }
-        System.out.printf("In Command Factory, Command Received is :  " + commandName );
+
         return commands.get(commandName.toUpperCase());
     }
 }
