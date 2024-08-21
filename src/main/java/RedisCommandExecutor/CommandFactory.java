@@ -16,6 +16,7 @@ public class CommandFactory {
         commands.put("MULTI", new MultiCommand());
         commands.put("EXEC", new ExecCommand());
         commands.put("DISCARD", new DiscardCommand());
+        commands.put("TYPE", new TypeCommand());
 
     }
 
