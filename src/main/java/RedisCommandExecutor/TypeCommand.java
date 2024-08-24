@@ -14,7 +14,7 @@ public class TypeCommand implements IRedisCommandHandler{
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         String key = args.get(0);
         RedisServer.KeyValue keyValue = RedisServer.Main.storeKeyValue.get(key);
-        if (keyValue == null || keyValue.isExpired() ) {
+        if (!Main.streams.containsKey(key) || keyValue == null || keyValue.isExpired() ) {
             RedisServer.Main.storeKeyValue.remove(key);
             sendSimpleResponse(outputStream, "none");
         } else {
