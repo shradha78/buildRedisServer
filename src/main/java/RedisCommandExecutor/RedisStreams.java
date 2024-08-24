@@ -42,11 +42,14 @@ public class RedisStreams {
     }
 
     private long autogenerateSequenceNumber(long idTimestamp) {
+        System.out.printf("##### IN Auto generate SEQ : " + idTimestamp);
         if (idTimestamp == lastTimestamp) {
+            System.out.printf("If equal to last entry******** \n");
             return ++sequenceNumber;
         }
         lastTimestamp = idTimestamp;
         if(idTimestamp == 0){
+            System.out.printf("If equal to 0  " + idTimestamp +"\n");
             return 1;
         }
         sequenceNumber = 0;
@@ -67,7 +70,7 @@ public class RedisStreams {
         String[] idSplit = id.split("-");
         long idTimestamp = Long.parseLong(idSplit[0]);
         long idSequenceNum = idSplit[1].equals("*") ? autogenerateSequenceNumber(idTimestamp) : Long.parseLong(idSplit[1]);
-
+        System.out.printf("********* Stream Id : "+ idTimestamp + " " + idSequenceNum + "\n");
         if (idTimestamp == 0 && idSequenceNum == 0) {
             return Constants.GREATER_THAN_ZERO;
         }
