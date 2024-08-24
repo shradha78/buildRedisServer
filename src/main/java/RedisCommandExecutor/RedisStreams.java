@@ -12,7 +12,7 @@ public class RedisStreams {
     private final Map<String, List<KeyValue>> streamEntries;
     private long lastTimestamp;
     private long sequenceNumber;
-
+    private String lastStreamId = "";
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
         this.streamEntries = new LinkedHashMap<>();
@@ -20,67 +20,68 @@ public class RedisStreams {
         this.sequenceNumber = 0;
     }
 
-    public String getStreamKey() {
-        return streamKey;
-    }
-
     public String addEntryToStreamID(String id, KeyValue entry) {
-        if (id == null || id.isEmpty()) {
-            id = generateId();
+        if (id.equals("*")) {
+            id = autoGenerateId();
+        } else {
+            id = processId(id);
         }
         streamEntries.computeIfAbsent(id, k -> new ArrayList<>()).add(entry);
+        lastStreamId = id;
         return id;
     }
 
-    private String generateId() {
+    private String processId(String id) {
+        String[] idSplit = id.split("-");
+        long idTimestamp = Long.parseLong(idSplit[0]);
+        if (idSplit[1].equals("*")) {
+            long sequenceNumber = autogenerateSequenceNumber(idTimestamp);
+            return idTimestamp + "-" + sequenceNumber;
+        }
+        return id;
+    }
+
+    private long autogenerateSequenceNumber(long idTimestamp) {
+        if (idTimestamp == lastTimestamp) {
+            return ++sequenceNumber;
+        }
+        lastTimestamp = idTimestamp;
+        sequenceNumber = 0;
+        return sequenceNumber;
+    }
+
+    private String autoGenerateId() {
         long currentTimestamp = System.currentTimeMillis();
         if (currentTimestamp == lastTimestamp) {
-            synchronized (RedisStreams.class) {
-                if (currentTimestamp == lastTimestamp) {
-                    sequenceNumber++;
-                }
-            }
-        } else {
-            lastTimestamp = currentTimestamp;
-            sequenceNumber = 0;
+            return currentTimestamp + "-" + (++sequenceNumber);
         }
-        return currentTimestamp + "-" + sequenceNumber;
+        lastTimestamp = currentTimestamp;
+        sequenceNumber = 0;
+        return currentTimestamp + "-0";
     }
 
     public Constants validateStreamId(String id) {
-        System.out.printf("In Validate Stream : " + id +"\n");
         String[] idSplit = id.split("-");
         long idTimestamp = Long.parseLong(idSplit[0]);
-        long idSequenceNum = Long.parseLong(idSplit[1]);
+        long idSequenceNum = idSplit[1].equals("*") ? autogenerateSequenceNumber(idTimestamp) : Long.parseLong(idSplit[1]);
 
-        String lastIDEnteredInStream = getLastStreamId();
-        System.out.printf("In Validate Stream, last Entered Stream id : " + lastIDEnteredInStream +"\n");
-        if (lastIDEnteredInStream.isEmpty() || lastIDEnteredInStream.equals("")) {
-            if (idTimestamp == 0 && idSequenceNum == 0) {
-                return Constants.GREATER_THAN_ZERO;
-            }
-            return Constants.VALID;
+        if (idTimestamp == 0 && idSequenceNum == 0) {
+            return Constants.GREATER_THAN_ZERO;
         }
 
-        String[] lastIdSplit = lastIDEnteredInStream.split("-");
-        long lastIdTimestamp = Long.parseLong(lastIdSplit[0]);
-        long lastIdSequence = Long.parseLong(lastIdSplit[1]);
+        if (!lastStreamId.isEmpty()) {
+            String[] lastIdSplit = lastStreamId.split("-");
+            long lastIdTimestamp = Long.parseLong(lastIdSplit[0]);
+            long lastIdSequence = Long.parseLong(lastIdSplit[1]);
 
-        if (idTimestamp > lastIdTimestamp || (idTimestamp == lastIdTimestamp && idSequenceNum > lastIdSequence)) {
-            return Constants.VALID;
-        } else {
-            if (idTimestamp == 0 && idSequenceNum == 0) {
-                return Constants.GREATER_THAN_ZERO;
+            if (idTimestamp < lastIdTimestamp || (idTimestamp == lastIdTimestamp && idSequenceNum <= lastIdSequence)) {
+                return Constants.EQUAL_OR_SMALLER;
             }
-            return Constants.EQUAL_OR_SMALLER;
         }
+        return Constants.VALID;
     }
 
     private String getLastStreamId() {
-        String lastKey = "";
-        for (String key : streamEntries.keySet()) {
-            lastKey = key;
-        }
-        return lastKey;
+        return lastStreamId;
     }
 }
