@@ -58,7 +58,9 @@ public class RedisStreams {
 
     private String autoGenerateId() {
         long currentTimestamp = System.currentTimeMillis();
+        System.out.printf("^^^^^^ Auto generating ID here : "+ currentTimestamp + "\n");
         if (currentTimestamp == lastTimestamp) {
+            System.out.printf("^^^ Auto Id generated : " + currentTimestamp + " "+ (sequenceNumber+1) + "\n" );
             return currentTimestamp + "-" + (++sequenceNumber);
         }
         lastTimestamp = currentTimestamp;
