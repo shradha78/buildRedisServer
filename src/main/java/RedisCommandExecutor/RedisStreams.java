@@ -45,10 +45,10 @@ public class RedisStreams {
         if (idTimestamp == lastTimestamp) {
             return ++sequenceNumber;
         }
+        lastTimestamp = idTimestamp;
         if(idTimestamp == 0){
             return 1;
         }
-        lastTimestamp = idTimestamp;
         sequenceNumber = 0;
         return sequenceNumber;
     }
