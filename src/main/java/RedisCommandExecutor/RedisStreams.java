@@ -69,7 +69,8 @@ public class RedisStreams {
     public Constants validateStreamId(String id) {
         String[] idSplit = id.split("-");
         long idTimestamp = Long.parseLong(idSplit[0]);
-        long idSequenceNum = idSplit[1].equals("*") ? autogenerateSequenceNumber(idTimestamp) : Long.parseLong(idSplit[1]);
+        long idSequenceNum = idSplit[1].equals("*") ? 10000000 : Long.parseLong(idSplit[1]);
+        if(idSequenceNum == 10000000 ) return Constants.VALID;
         System.out.printf("********* Stream Id : "+ idTimestamp + " " + idSequenceNum + "\n");
         if (idTimestamp == 0 && idSequenceNum == 0) {
             return Constants.GREATER_THAN_ZERO;
