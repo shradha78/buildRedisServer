@@ -48,12 +48,14 @@ public class RedisStreams {
     }
 
     public Constants validateStreamId(String id) {
+        System.out.printf("In Validate Stream : " + id +"\n");
         String[] idSplit = id.split("-");
         long idTimestamp = Long.parseLong(idSplit[0]);
         long idSequenceNum = Long.parseLong(idSplit[1]);
 
         String lastIDEnteredInStream = getLastStreamId();
-        if (lastIDEnteredInStream.isEmpty()) {
+        System.out.printf("In Validate Stream, last Entered Stream id : " + lastIDEnteredInStream +"\n");
+        if (lastIDEnteredInStream.isEmpty() || lastIDEnteredInStream.equals("")) {
             if (idTimestamp == 0 && idSequenceNum == 0) {
                 return Constants.GREATER_THAN_ZERO;
             }
@@ -67,6 +69,9 @@ public class RedisStreams {
         if (idTimestamp > lastIdTimestamp || (idTimestamp == lastIdTimestamp && idSequenceNum > lastIdSequence)) {
             return Constants.VALID;
         } else {
+            if (idTimestamp == 0 && idSequenceNum == 0) {
+                return Constants.GREATER_THAN_ZERO;
+            }
             return Constants.EQUAL_OR_SMALLER;
         }
     }
