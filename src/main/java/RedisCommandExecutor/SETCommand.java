@@ -24,7 +24,7 @@ public class SETCommand implements IRedisCommandHandler{
             expiryTime = System.currentTimeMillis() + seconds; //storing future expiry time
             System.out.printf("Expiry time is  " + expiryTime + "\n");
         }
-        RedisServer.Main.storeKeyValue.put(setKey,new RedisServer.KeyValue(setValue, expiryTime));
+        RedisServer.Main.storeKeyValue.put(setKey,new RedisServer.KeyValue(setKey,setValue, expiryTime));
         sendSimpleOKResponse(outputStream);
     }
     public static void sendSimpleOKResponse(OutputStream outputStream) throws IOException {

@@ -2,6 +2,7 @@ package RedisServer;
 
 import RedisCommandExecutor.CommandFactory;
 import RedisCommandExecutor.IRedisCommandHandler;
+import RedisCommandExecutor.RedisStreams;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -15,6 +16,7 @@ public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
+    public static HashMap<String, RedisStreams> streams;
     public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -29,6 +31,7 @@ public class Main {
         redisCommandParser = new RedisCommandParser();
         redisProtocolParser = new RedisProtocolParser();
         storeKeyValue = new HashMap<>();
+        streams = new HashMap<>();
 
         try {
             serverSocket = new ServerSocket(port);

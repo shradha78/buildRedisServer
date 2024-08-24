@@ -1,12 +1,16 @@
 package RedisServer;
 
 public class KeyValue {
+    private  String key;
     private String value;
     private long expiryTime; // Store expiry time in milliseconds
 
-    public KeyValue(String value, long expiryTime) {
+    public KeyValue(String key, String value, long expiryTime) {
         this.value = value;
         this.expiryTime = expiryTime;
+    }
+    public String getKey(){
+        return key;
     }
     public String getValue() {
         return value;

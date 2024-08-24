@@ -16,7 +16,7 @@ public class IncrCommand implements IRedisCommandHandler{
         }
         String keyIncr = args.get(0);
         KeyValue keyValueIncr = RedisServer.Main.storeKeyValue.containsKey(keyIncr) ?
-                                    RedisServer.Main.storeKeyValue.get(keyIncr) : new KeyValue("0",0);
+                                    RedisServer.Main.storeKeyValue.get(keyIncr) : new KeyValue(keyIncr,"0",0);
         String value = keyValueIncr.getValue();
         int valueIncr = 0;
         try {
@@ -26,7 +26,7 @@ public class IncrCommand implements IRedisCommandHandler{
             sendErrorResponse(outputStream, "value is not an integer or out of range");
             return;
         }
-        RedisServer.Main.storeKeyValue.put(keyIncr, (new RedisServer.KeyValue(String.valueOf(valueIncr),0)));
+        RedisServer.Main.storeKeyValue.put(keyIncr, (new RedisServer.KeyValue(keyIncr,String.valueOf(valueIncr),0)));
         sendIntegerResponse(outputStream, String.valueOf(valueIncr),"Integer value is ");
     }
 
