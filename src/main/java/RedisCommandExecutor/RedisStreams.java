@@ -45,6 +45,9 @@ public class RedisStreams {
         if (idTimestamp == lastTimestamp) {
             return ++sequenceNumber;
         }
+        if(idTimestamp == 0){
+            return 1;
+        }
         lastTimestamp = idTimestamp;
         sequenceNumber = 0;
         return sequenceNumber;
@@ -57,7 +60,7 @@ public class RedisStreams {
         }
         lastTimestamp = currentTimestamp;
         sequenceNumber = 0;
-        return currentTimestamp + "-0";
+        return currentTimestamp + "-" + sequenceNumber;
     }
 
     public Constants validateStreamId(String id) {
