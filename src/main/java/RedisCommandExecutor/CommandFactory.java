@@ -17,6 +17,7 @@ public class CommandFactory {
         commands.put("EXEC", new ExecCommand());
         commands.put("DISCARD", new DiscardCommand());
         commands.put("TYPE", new TypeCommand());
+        commands.put("XADD", new XaddCommand());
 
     }
 
