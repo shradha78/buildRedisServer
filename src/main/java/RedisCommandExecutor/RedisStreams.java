@@ -42,7 +42,7 @@ public class RedisStreams {
     }
 
     private long autogenerateSequenceNumber(long idTimestamp) {
-        System.out.printf("##### IN Auto generate SEQ : " + idTimestamp);
+        System.out.printf("##### IN Auto generate SEQ : " + idTimestamp + "\n");
         if (idTimestamp == lastTimestamp) {
             System.out.printf("If equal to last entry******** \n");
             return ++sequenceNumber;
