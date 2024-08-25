@@ -60,6 +60,7 @@ public class RedisStreams {
 
         if (currentTimestamp == lastTimestamp) {
             // If the current timestamp is the same as the last one, increment the sequence number.
+            System.out.printf("*****Here if id exists Already ");
             sequenceNumber++;
         } else {
             // If the timestamp is different, reset the sequence number to 0.
