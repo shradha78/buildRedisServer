@@ -23,6 +23,7 @@ public class RedisStreams {
         } else {
             id = processId(id);
         }
+        System.out.printf("### Adding to Stream : "+ id + "------" + entry.getKey() + "_____" + entry.getValue() + "\n");
         streamEntries.put(id,entry);
         lastStreamId = id;
         return id;
