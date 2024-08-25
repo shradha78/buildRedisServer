@@ -49,7 +49,6 @@ public class RedisStreams {
             System.out.printf("If equal to last entry******** \n");
             return ++sequenceNumber;
         }
-        lastTimestamp = idTimestamp; // Update lastTimestamp here
         if (idTimestamp == 0) {
             System.out.printf("If equal to 0 " + idTimestamp + "\n");
             return 1;
@@ -90,6 +89,7 @@ public class RedisStreams {
                 return Constants.EQUAL_OR_SMALLER;
             }
         }
+        lastTimestamp = idTimestamp;
         return Constants.VALID;
     }
 
