@@ -6,6 +6,7 @@ public class KeyValue {
     private long expiryTime; // Store expiry time in milliseconds
 
     public KeyValue(String key, String value, long expiryTime) {
+        this.key = key;
         this.value = value;
         this.expiryTime = expiryTime;
     }
