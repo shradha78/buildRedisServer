@@ -37,6 +37,7 @@ public class RedisStreams {
         long idTimestamp = Long.parseLong(idSplit[0]);
         if (idSplit[1].equals("*")) {
             long sequenceNumber = autogenerateSequenceNumber(idTimestamp);
+            lastTimestamp = idTimestamp;
             return idTimestamp + "-" + sequenceNumber;
         }
         return id;
@@ -88,10 +89,8 @@ public class RedisStreams {
             if (idTimestamp < lastIdTimestamp || (idTimestamp == lastIdTimestamp && idSequenceNum <= lastIdSequence)) {
                 return Constants.EQUAL_OR_SMALLER;
             }
-            lastTimestamp = lastIdTimestamp;
-        }else{
-            lastTimestamp = idTimestamp;
         }
+        lastTimestamp = idTimestamp;
 
         return Constants.VALID;
     }
