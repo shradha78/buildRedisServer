@@ -88,8 +88,9 @@ public class RedisStreams {
             if (idTimestamp < lastIdTimestamp || (idTimestamp == lastIdTimestamp && idSequenceNum <= lastIdSequence)) {
                 return Constants.EQUAL_OR_SMALLER;
             }
+            lastTimestamp = lastIdTimestamp;
         }
-        lastTimestamp = idTimestamp;
+
         return Constants.VALID;
     }
 
