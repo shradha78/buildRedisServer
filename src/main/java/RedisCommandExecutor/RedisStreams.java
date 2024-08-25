@@ -98,6 +98,7 @@ public class RedisStreams {
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
             if(id >= idFrom && id <= idTo){
+                System.out.printf("****** IN Getting list : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
                 list.put(entry.getKey(),entry.getValue());
             }
         }
