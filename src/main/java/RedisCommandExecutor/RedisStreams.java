@@ -2,10 +2,7 @@ package RedisCommandExecutor;
 
 import RedisServer.KeyValue;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RedisStreams {
     private final String streamKey;
@@ -95,13 +92,13 @@ public class RedisStreams {
         return lastStreamId;
     }
 
-    public List<KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
-        List<KeyValue> list = new ArrayList<>();
+    public Map<String,KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
+        Map<String,KeyValue> list = new HashMap<>();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
             if(id >= idFrom && id <= idTo){
-                list.add(entry.getValue());
+                list.put(entry.getKey(),entry.getValue());
             }
         }
         return list;
