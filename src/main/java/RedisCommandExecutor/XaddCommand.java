@@ -18,7 +18,7 @@ public class XaddCommand implements IRedisCommandHandler{
         String streamKeyId = args.get(1);
         KeyValue newKeyValueToBeAdded = new KeyValue(args.get(2), args.get(3), 0);
 
-        RedisStreams redisStreams = Main.streams.getOrDefault(streamKey, new RedisStreams(streamKey));
+        RedisStreams redisStreams = Main.streams.computeIfAbsent(streamKey, RedisStreams::new);
         Constants validationResult = redisStreams.validateStreamId(streamKeyId);
 
         if (validationResult != Constants.VALID) {
