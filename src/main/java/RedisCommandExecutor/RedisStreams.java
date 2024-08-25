@@ -27,6 +27,7 @@ public class RedisStreams {
             id = processId(id);
         }
         streamEntries.put(id,entry);
+        lastTimestamp = System.currentTimeMillis();
         lastStreamId = id;
         return id;
     }

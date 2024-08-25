@@ -74,13 +74,9 @@ public class Main {
             OutputStream outputStream = clientSocket.getOutputStream();
             while(true){
                 try{
-                    System.out.printf("Going to RESP parser \n");
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
-                    System.out.printf("Going to command Parser \n");
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
-                    System.out.printf("Going to queuing commands \n");
                     queueCommands(command,session);
-                    System.out.printf("Going to process command method \n");
                     processCommand(command,outputStream,session);//based on commands, it will process output
                 }catch (IOException e){
                     outputStream.write("-ERR invalid input\r\n".getBytes());
@@ -95,13 +91,9 @@ public class Main {
     }
 
     public static void processCommand(RedisCommand command, OutputStream outputStream, ClientSession session) throws IOException {
-        System.out.printf("In Processing Command \n");
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
-
         System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
         if (redisCommandHandler != null) {
-            System.out.printf("command is : " + command.getCommand() +"\n");
-            System.out.printf("Arguments: " + command.getListOfActions() + "\n");
             redisCommandHandler.execute(command.getListOfActions(), outputStream,session);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
@@ -109,8 +101,6 @@ public class Main {
     }
 
     private static void queueCommands(RedisCommand command, ClientSession session) {
-        System.out.println("Processing Queue");
-
         Queue<RedisCommand> queueOfCommandsForMultiAndExec = session.getCommandQueue();
 
         if (!queueOfCommandsForMultiAndExec.isEmpty()) {
@@ -119,8 +109,6 @@ public class Main {
             }
         }
         queueOfCommandsForMultiAndExec.add(command);
-        if (!queueOfCommandsForMultiAndExec.isEmpty()) {
-            System.out.println("Command on front of queue: " + queueOfCommandsForMultiAndExec.peek().getCommand());
-        }
+
     }
 }
