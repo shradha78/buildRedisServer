@@ -40,14 +40,14 @@ public class RedisStreams {
     }
 
     private long autogenerateSequenceNumber(long idTimestamp) {
-        System.out.printf("##### IN Auto generate SEQ : " + idTimestamp + "\n");
+        System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d, sequenceNumber=%d\n", lastTimestamp, idTimestamp, sequenceNumber);
         if (idTimestamp == lastTimestamp) {
             System.out.printf("If equal to last entry******** \n");
             return ++sequenceNumber;
         }
-        lastTimestamp = idTimestamp;
-        if(idTimestamp == 0){
-            System.out.printf("If equal to 0  " + idTimestamp +"\n");
+        lastTimestamp = idTimestamp; // Update lastTimestamp here
+        if (idTimestamp == 0) {
+            System.out.printf("If equal to 0 " + idTimestamp + "\n");
             return 1;
         }
         sequenceNumber = 0;
@@ -56,20 +56,14 @@ public class RedisStreams {
 
     private String autoGenerateId() {
         long currentTimestamp = System.currentTimeMillis();
-        System.out.printf("^^^^^^ Auto generating ID here : " + currentTimestamp + "\n");
-
+        System.out.printf("^^^^^^ Auto generating ID here: lastTimestamp=%d, currentTimestamp=%d\n", lastTimestamp, currentTimestamp);
         if (currentTimestamp == lastTimestamp) {
-            // If the current timestamp is the same as the last one, increment the sequence number.
-            System.out.printf("*****Here if id exists Already ");
-            sequenceNumber++;
-        } else {
-            // If the timestamp is different, reset the sequence number to 0.
-            lastTimestamp = currentTimestamp;
-            sequenceNumber = 0;
+            System.out.printf("^^^ Auto Id generated: " + currentTimestamp + " " + (sequenceNumber + 1) + "\n");
+            return currentTimestamp + "-" + (++sequenceNumber);
         }
-        String generatedId = currentTimestamp + "-" + sequenceNumber;
-        System.out.printf("^^^ Auto Id generated : " + generatedId + "\n");
-        return generatedId;
+        lastTimestamp = currentTimestamp; // Update lastTimestamp here
+        sequenceNumber = 0;
+        return currentTimestamp + "-" + sequenceNumber;
     }
 
     public Constants validateStreamId(String id) {
