@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class RedisStreams {
     private final String streamKey;
-    private final Map<String, List<KeyValue>> streamEntries;
+    private final Map<String, KeyValue> streamEntries;
     private long lastTimestamp;
     private long sequenceNumber;
     private String lastStreamId = "";
@@ -26,7 +26,7 @@ public class RedisStreams {
         } else {
             id = processId(id);
         }
-        streamEntries.computeIfAbsent(id, k -> new ArrayList<>()).add(entry);
+        streamEntries.put(id,entry);
         lastStreamId = id;
         return id;
     }
@@ -93,5 +93,16 @@ public class RedisStreams {
 
     private String getLastStreamId() {
         return lastStreamId;
+    }
+
+    public List<KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
+        List<KeyValue> list = new ArrayList<>();
+        for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
+            long id = Long.parseLong(entry.getKey());
+            if(id >= idFrom && id <= idTo){
+                list.add(entry.getValue());
+            }
+        }
+        return list;
     }
 }
