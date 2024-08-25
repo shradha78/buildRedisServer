@@ -89,6 +89,8 @@ public class RedisStreams {
                 return Constants.EQUAL_OR_SMALLER;
             }
             lastTimestamp = lastIdTimestamp;
+        }else{
+            lastTimestamp = idTimestamp;
         }
 
         return Constants.VALID;
