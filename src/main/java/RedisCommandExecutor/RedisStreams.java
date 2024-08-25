@@ -46,6 +46,9 @@ public class RedisStreams {
             return ++sequenceNumber;
         }
         lastTimestamp = idTimestamp; // Update lastTimestamp here
+        if(idTimestamp == 0){
+            return 1;
+        }
         System.out.printf("Setting new lastTimestamp=%d\n", lastTimestamp);
         sequenceNumber = 0;
         return sequenceNumber;
