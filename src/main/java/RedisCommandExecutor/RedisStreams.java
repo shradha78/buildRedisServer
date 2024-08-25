@@ -46,11 +46,18 @@ public class RedisStreams {
     private long autogenerateSequenceNumber(long idTimestamp) {
         System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d\n", lastTimestamp, idTimestamp);
 
-        // Initialize sequence number for new timestamp if not already tracked
-        sequenceNumbersByTimestamp.putIfAbsent(idTimestamp, idTimestamp == 0 ? 1L : 0L);
+        if (idTimestamp == lastTimestamp) {
+            System.out.printf("If equal to last entry******** \n");
+            return ++sequenceNumber;
+        }
+        lastTimestamp = idTimestamp; // Update lastTimestamp here
+        if (idTimestamp == 0) {
+            System.out.printf("If equal to 0 " + idTimestamp + "\n");
+            return 1;
+        }
 
-        // Increment and return the sequence number for the current timestamp
-        return sequenceNumbersByTimestamp.compute(idTimestamp, (key, value) -> value + 1);
+        sequenceNumber = 0;
+        return sequenceNumber;
     }
 
     private String autoGenerateId() {
