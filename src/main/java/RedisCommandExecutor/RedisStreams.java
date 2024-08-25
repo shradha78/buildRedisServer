@@ -61,9 +61,6 @@ public class RedisStreams {
             // Increment sequence number if timestamp is the same
             return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
         }
-
-        // Update lastTimestamp and initialize sequence number for new timestamp
-        lastTimestamp = currentTimestamp;
         return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
     }
 
