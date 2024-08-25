@@ -10,11 +10,14 @@ public class RedisStreams {
     private long lastTimestamp;
     private long sequenceNumber;
     private String lastStreamId = "";
+    private final Map<Long, Long> sequenceNumbersByTimestamp ;
+
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
         this.streamEntries = new LinkedHashMap<>();
         this.lastTimestamp = System.currentTimeMillis();
         this.sequenceNumber = 0;
+        this.sequenceNumbersByTimestamp = new HashMap<>();
     }
 
     public String addEntryToStreamID(String id, KeyValue entry) {
@@ -41,26 +44,30 @@ public class RedisStreams {
 
     private long autogenerateSequenceNumber(long idTimestamp) {
         System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d, sequenceNumber=%d\n", lastTimestamp, idTimestamp, sequenceNumber);
+
         if (idTimestamp == lastTimestamp) {
-            System.out.printf("Incrementing sequenceNumber for same timestamp\n");
+            // Increment the sequence number for the current timestamp
             return ++sequenceNumber;
         }
-        lastTimestamp = idTimestamp; // Update lastTimestamp here
-        if(idTimestamp == 0){
-            return 1;
-        }
-        System.out.printf("Setting new lastTimestamp=%d\n", lastTimestamp);
-        sequenceNumber = 0;
+
+        // Handle new timestamps
+        sequenceNumbersByTimestamp.put(lastTimestamp, sequenceNumber); // Save the last used sequence number for the lastTimestamp
+        lastTimestamp = idTimestamp; // Update to the new timestamp
+
+        // Start sequence number from 0 if the new timestamp is 0
+        sequenceNumber = (idTimestamp == 0) ? 1 : 0;
         return sequenceNumber;
     }
 
     private String autoGenerateId() {
         long currentTimestamp = System.currentTimeMillis();
         System.out.printf("^^^^^^ Auto generating ID here: lastTimestamp=%d, currentTimestamp=%d\n", lastTimestamp, currentTimestamp);
+
         if (currentTimestamp == lastTimestamp) {
             System.out.printf("^^^ Auto Id generated: " + currentTimestamp + " " + (sequenceNumber + 1) + "\n");
             return currentTimestamp + "-" + (++sequenceNumber);
         }
+
         lastTimestamp = currentTimestamp; // Update lastTimestamp here
         sequenceNumber = 0;
         return currentTimestamp + "-" + sequenceNumber;
