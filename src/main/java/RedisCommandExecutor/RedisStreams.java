@@ -26,7 +26,6 @@ public class RedisStreams {
         } else {
             id = processId(id);
         }
-        System.out.printf("### Adding to Stream : "+ id + "------" + entry.getKey() + "_____" + entry.getValue() + "\n");
         streamEntries.put(id,entry);
         lastStreamId = id;
         return id;
@@ -43,20 +42,13 @@ public class RedisStreams {
     }
 
     private long autogenerateSequenceNumber(long idTimestamp) {
-        System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d, sequenceNumber=%d\n", lastTimestamp, idTimestamp, sequenceNumber);
+        System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d\n", lastTimestamp, idTimestamp);
 
-        if (idTimestamp == lastTimestamp) {
-            // Increment the sequence number for the current timestamp
-            return ++sequenceNumber;
-        }
+        // Initialize sequence number for new timestamp if not already tracked
+        sequenceNumbersByTimestamp.putIfAbsent(idTimestamp, idTimestamp == 0 ? 1L : 0L);
 
-        // Handle new timestamps
-        sequenceNumbersByTimestamp.put(lastTimestamp, sequenceNumber); // Save the last used sequence number for the lastTimestamp
-        lastTimestamp = idTimestamp; // Update to the new timestamp
-
-        // Start sequence number from 0 if the new timestamp is 0
-        sequenceNumber = (idTimestamp == 0) ? 1 : 0;
-        return sequenceNumber;
+        // Increment and return the sequence number for the current timestamp
+        return sequenceNumbersByTimestamp.compute(idTimestamp, (key, value) -> value + 1);
     }
 
     private String autoGenerateId() {
@@ -64,13 +56,13 @@ public class RedisStreams {
         System.out.printf("^^^^^^ Auto generating ID here: lastTimestamp=%d, currentTimestamp=%d\n", lastTimestamp, currentTimestamp);
 
         if (currentTimestamp == lastTimestamp) {
-            System.out.printf("^^^ Auto Id generated: " + currentTimestamp + " " + (sequenceNumber + 1) + "\n");
-            return currentTimestamp + "-" + (++sequenceNumber);
+            // Increment sequence number if timestamp is the same
+            return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
         }
 
-        lastTimestamp = currentTimestamp; // Update lastTimestamp here
-        sequenceNumber = 0;
-        return currentTimestamp + "-" + sequenceNumber;
+        // Update lastTimestamp and initialize sequence number for new timestamp
+        lastTimestamp = currentTimestamp;
+        return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
     }
 
     public Constants validateStreamId(String id) {
