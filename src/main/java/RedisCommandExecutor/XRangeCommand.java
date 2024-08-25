@@ -13,13 +13,13 @@ public class XRangeCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         String key = args.get(0);
-        long rangeFrom = Long.parseLong(args.get(1));
-        long rangeTo = Long.parseLong(args.get(2));
+        String[] idFromSplitArray = args.get(1).split("-");
+        String[] idToSplitArray = args.get(2).split("-");
+        long rangeFrom = Long.parseLong(idFromSplitArray[0]) + Long.parseLong(idFromSplitArray[1]);
+        long rangeTo = Long.parseLong(idToSplitArray[0]) + Long.parseLong(idToSplitArray[1]);
         RedisStreams streamKey = Main.streams.get(key);
         List<KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesWithinStreamRange(rangeFrom,rangeTo);
         sendArrayRESPresponse(outputStream, listOfValuesInStreamWithKey);
-
-
     }
     public void sendArrayRESPresponse(OutputStream outputStream, List<KeyValue> list) throws IOException {
         StringBuilder sb = new StringBuilder();

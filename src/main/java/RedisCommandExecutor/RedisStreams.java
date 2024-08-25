@@ -98,7 +98,8 @@ public class RedisStreams {
     public List<KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
         List<KeyValue> list = new ArrayList<>();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
-            long id = Long.parseLong(entry.getKey());
+            String[] idSplit = entry.getKey().split("-");
+            long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
             if(id >= idFrom && id <= idTo){
                 list.add(entry.getValue());
             }
