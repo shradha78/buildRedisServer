@@ -42,14 +42,11 @@ public class RedisStreams {
     private long autogenerateSequenceNumber(long idTimestamp) {
         System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d, sequenceNumber=%d\n", lastTimestamp, idTimestamp, sequenceNumber);
         if (idTimestamp == lastTimestamp) {
-            System.out.printf("If equal to last entry******** \n");
+            System.out.printf("Incrementing sequenceNumber for same timestamp\n");
             return ++sequenceNumber;
         }
         lastTimestamp = idTimestamp; // Update lastTimestamp here
-        if (idTimestamp == 0) {
-            System.out.printf("If equal to 0 " + idTimestamp + "\n");
-            return 1;
-        }
+        System.out.printf("Setting new lastTimestamp=%d\n", lastTimestamp);
         sequenceNumber = 0;
         return sequenceNumber;
     }
