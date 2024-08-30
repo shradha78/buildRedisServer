@@ -116,4 +116,22 @@ public class RedisStreams {
         }
         return list;
     }
+
+    public Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom){
+        Map<String,KeyValue> list = new HashMap<>();
+        for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
+            String[] idSplit = entry.getKey().split("-");
+            long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
+            boolean withinRange = (id >= idFrom);
+
+            if (withinRange) {
+                System.out.printf("****** IN Getting list : %s____%s------%s%n",
+                        entry.getKey(),
+                        entry.getValue().getKey(),
+                        entry.getValue().getValue());
+                list.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return list;
+    }
 }

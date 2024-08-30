@@ -44,7 +44,7 @@ public class XRangeCommand implements IRedisCommandHandler{
         return Long.parseLong(idParts[0]) + Long.parseLong(idParts[1]);
     }
 
-    public void sendArrayRESPresponse(OutputStream outputStream, Map<String, KeyValue> list) throws IOException {
+    public static void sendArrayRESPresponse(OutputStream outputStream, Map<String, KeyValue> list) throws IOException {
         StringBuilder sb = new StringBuilder();
 
         // Start with the array header indicating the number of key-value pairs.

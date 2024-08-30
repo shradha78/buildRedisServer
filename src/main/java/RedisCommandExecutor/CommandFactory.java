@@ -19,6 +19,7 @@ public class CommandFactory {
         commands.put("TYPE", new TypeCommand());
         commands.put("XADD", new XaddCommand());
         commands.put("XRANGE", new XRangeCommand());
+        commands.put("XREAD", new XReadCommand());
 
     }
 
