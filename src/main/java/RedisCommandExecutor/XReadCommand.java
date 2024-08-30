@@ -12,7 +12,7 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
-    private static final long POLL_INTERVAL_MS = 100;
+    private static final long POLL_INTERVAL_MS = 10;
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int startIndex = 1;
