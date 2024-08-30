@@ -42,12 +42,13 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
 
-        while (System.currentTimeMillis() < endTime) {
+        while (System.currentTimeMillis() < endTime && (startTime/1000 < startTime/1000 + 10) ) {
             Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
             if (!responseMap.isEmpty()) {
                 sendArrayRESPresponseForXRead(outputStream, responseMap);
                 return; // Exit after sending response
             }
+            startTime = System.currentTimeMillis();
 
 //            try {
 //                synchronized (this) {
