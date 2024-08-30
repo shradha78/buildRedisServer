@@ -65,8 +65,9 @@ public class RedisStreams {
             // Increment sequence number if timestamp is the same
             return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
         }
+        long sequenceNumber = autogenerateSequenceNumber(currentTimestamp);
         lastTimestamp = currentTimestamp;
-        return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
+        return currentTimestamp + "-" + sequenceNumber;
     }
 
     public Constants validateStreamId(String id) {
