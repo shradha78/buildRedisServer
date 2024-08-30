@@ -58,17 +58,20 @@ public class XReadCommand implements IRedisCommandHandler{
 
             for (KeyValue kv : keyValuePairs) {
                 String id = kv.getKey(); // Assuming the key is used as the ID
+                String value = kv.getValue();
 
-                // Each entry starts with an array containing the ID and its field-value pair
+                // Each entry starts with an array containing the ID and its field-value pair array
                 sb.append("*2").append("\r\n");
 
                 // Add the ID as a bulk string
                 sb.append("$").append(id.length()).append("\r\n");
                 sb.append(id).append("\r\n");
 
-                // Add the field-value pair
-                String field = "field";  // Assuming a fixed field name (adjust as needed)
-                String value = kv.getValue();
+                // Add the field-value pair array
+                sb.append("*2").append("\r\n");
+
+                // Since you don't have explicit fields in KeyValue, we'll assume "data" as the field name
+                String field = "data"; // Adjust this field name as needed
 
                 // Add the field as a bulk string
                 sb.append("$").append(field.length()).append("\r\n");
