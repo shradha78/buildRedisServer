@@ -14,7 +14,7 @@ public class RedisStreams {
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
         this.streamEntries = new LinkedHashMap<>();
-        this.lastTimestamp = System.currentTimeMillis();
+        this.lastTimestamp = 0;
         this.sequenceNumber = 0;
     }
 
