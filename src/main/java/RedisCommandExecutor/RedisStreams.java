@@ -122,7 +122,7 @@ public class RedisStreams {
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
-            boolean withinRange = (id >= idFrom);
+            boolean withinRange = (id > idFrom);
 
             if (withinRange) {
                 System.out.printf("****** IN Getting list : %s____%s------%s%n",

@@ -15,8 +15,8 @@ public class XReadCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int numberOfArgs = args.size();
-        int k = numberOfArgs/2;
-        for(int i = 0; i < numberOfArgs/2 ; i++ ) {
+        int k = numberOfArgs/2 + 1;
+        for(int i = 1 ; i <= numberOfArgs/2 ; i++ ) {
             String key = args.get(i);
             String id = args.get(k);
             long rangeFrom = 0;
