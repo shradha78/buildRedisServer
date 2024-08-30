@@ -12,7 +12,7 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
-    private static final long POLL_INTERVAL_MS = 100;
+    private static final long POLL_INTERVAL_MS = 5000;
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int startIndex = 1;
@@ -41,13 +41,17 @@ public class XReadCommand implements IRedisCommandHandler{
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
-        Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
-        boolean timeout = true;
-        while (System.currentTimeMillis() < endTime ) {
+        Map<String, Map<String, KeyValue>> responseMap;
+
+        // Loop to keep checking for new data until timeout
+        while (System.currentTimeMillis() < endTime) {
+            responseMap = processStreams(args, startIndex, streamCount, null);
+
             if (!responseMap.isEmpty()) {
-                timeout = false;
-                break;
+                sendArrayRESPresponseForXRead(outputStream, responseMap);
+                return; // Exit after sending response
             }
+
             try {
                 System.out.printf("Thread Sleep during BLOCK wait \n");
                 Thread.sleep(POLL_INTERVAL_MS);
@@ -56,18 +60,11 @@ public class XReadCommand implements IRedisCommandHandler{
                 System.out.printf("Thread interrupted during BLOCK wait");
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             }
-            responseMap = processStreams(args, startIndex, streamCount, null);
-            System.out.printf("Inside while loop, is response map null ? " + responseMap.isEmpty() + "\n");
         }
 
         // Send null response if no data was available and there was a timeout
-        if(timeout) {
-            System.out.printf("timeoutttt");
-            sendBulkStringResponse(outputStream, "", "There's a timeout and no value recieved");
-            return;
-        }
-        sendArrayRESPresponseForXRead(outputStream, responseMap);
-        return;
+        System.out.printf("timeoutttt");
+        sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
     }
 
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount, OutputStream outputStream) throws IOException {
