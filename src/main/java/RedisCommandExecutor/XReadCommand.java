@@ -29,7 +29,7 @@ public class XReadCommand implements IRedisCommandHandler{
             RedisStreams streamKey = Main.streams.get(key);
             Map<String,KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
 
-            responseMap.put(key, listOfValuesInStreamWithKey);
+            responseMap.put(key, listOfValuesInStreamWithKey);//adding stream key and all values from that stream
         }
 
         sendArrayRESPresponseForXRead(outputStream, responseMap);
