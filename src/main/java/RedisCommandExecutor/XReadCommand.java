@@ -6,17 +6,14 @@ import RedisServer.Main;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        TreeMap<String,Map<String,KeyValue>> responseMap = new TreeMap<>();
+        Map<String,Map<String,KeyValue>> responseMap = new LinkedHashMap<>();
         int numberOfArgs = args.size();
         int k = numberOfArgs / 2 + 1;
 

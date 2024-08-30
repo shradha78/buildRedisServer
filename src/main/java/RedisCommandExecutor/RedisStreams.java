@@ -118,7 +118,7 @@ public class RedisStreams {
     }
 
     public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom){
-        Map<String,KeyValue> list = new HashMap<>();
+        Map<String,KeyValue> list = new LinkedHashMap<>();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
