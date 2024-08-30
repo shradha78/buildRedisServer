@@ -9,13 +9,14 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        Map<String,Map<String,KeyValue>> responseMap = new HashMap<>();
+        TreeMap<String,Map<String,KeyValue>> responseMap = new TreeMap<>();
         int numberOfArgs = args.size();
         int k = numberOfArgs / 2 + 1;
 
