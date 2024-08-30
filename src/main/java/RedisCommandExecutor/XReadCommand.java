@@ -50,10 +50,9 @@ public class XReadCommand implements IRedisCommandHandler{
             }
 
             try {
-                synchronized (this) {
-                    System.out.printf("Thread Sleep during BLOCK wait");
+                    System.out.printf("Thread Sleep during BLOCK wait \n");
                     Thread.sleep(POLL_INTERVAL_MS);
-                }// Short delay before rechecking
+                // Short delay before rechecking
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // Restore interrupt status
                 System.out.printf("Thread interrupted during BLOCK wait");
