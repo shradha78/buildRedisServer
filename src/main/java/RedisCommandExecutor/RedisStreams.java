@@ -6,7 +6,7 @@ import java.util.*;
 
 public class RedisStreams {
     private final String streamKey;
-    private final Map<String, KeyValue> streamEntries;
+    private final Map<String, KeyValue> streamEntries;//stream key, <ID Value>
     private long lastTimestamp;
     private long sequenceNumber;
     private String lastStreamId = "";
@@ -65,6 +65,7 @@ public class RedisStreams {
             // Increment sequence number if timestamp is the same
             return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
         }
+        lastTimestamp = currentTimestamp;
         return currentTimestamp + "-" + autogenerateSequenceNumber(currentTimestamp);
     }
 
@@ -88,7 +89,7 @@ public class RedisStreams {
                 return Constants.EQUAL_OR_SMALLER;
             }
         }
-        lastTimestamp = idTimestamp;
+       // lastTimestamp = idTimestamp;
 
         return Constants.VALID;
     }
