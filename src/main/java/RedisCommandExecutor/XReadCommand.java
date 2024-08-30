@@ -67,7 +67,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
         for (int i = 0; i < streamCount; i++) {
             String key = args.get(currentIndex);
-            String id = args.get(currentIndex + streamCount);
+            String id = args.get(currentIndex + streamCount - 1);
 
             long rangeFrom = parseIdToRange(id);
 
