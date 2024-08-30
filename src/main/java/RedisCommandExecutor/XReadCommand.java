@@ -65,9 +65,9 @@ public class XReadCommand implements IRedisCommandHandler{
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
         int currentIndex = startIndex;
 
-        for (int i = 0; i < streamCount; i++) {
-            String key = args.get(currentIndex);
-            String id = args.get(currentIndex + streamCount - 1);
+        for (int i = startIndex; i < streamCount; i++) {
+            String key = args.get(i);
+            String id = args.get(i + streamCount - 1);
 
             long rangeFrom = parseIdToRange(id);
 
@@ -79,7 +79,6 @@ public class XReadCommand implements IRedisCommandHandler{
                 responseMap.put(key, new LinkedHashMap<>()); // Handle missing stream key
             }
 
-            currentIndex++;
         }
 
         if (outputStream != null) {
