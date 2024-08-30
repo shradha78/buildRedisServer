@@ -42,24 +42,23 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
 
-        while (System.currentTimeMillis() < endTime && (startTime/1000 < startTime/1000 + 10) ) {
+        while (System.currentTimeMillis() < endTime ) {
             Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
             if (!responseMap.isEmpty()) {
                 sendArrayRESPresponseForXRead(outputStream, responseMap);
                 return; // Exit after sending response
             }
-            startTime = System.currentTimeMillis();
 
-//            try {
-//                synchronized (this) {
-//                    System.out.printf("Thread Sleep during BLOCK wait");
-//                    Thread.sleep(POLL_INTERVAL_MS);
-//                }// Short delay before rechecking
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt(); // Restore interrupt status
-//                System.out.printf("Thread interrupted during BLOCK wait");
-//                throw new IOException("Thread interrupted during BLOCK wait", e);
-//            }
+            try {
+                synchronized (this) {
+                    System.out.printf("Thread Sleep during BLOCK wait");
+                    Thread.sleep(POLL_INTERVAL_MS);
+                }// Short delay before rechecking
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupt status
+                System.out.printf("Thread interrupted during BLOCK wait");
+                throw new IOException("Thread interrupted during BLOCK wait", e);
+            }
         }
 
         // Send null response if no data was available
@@ -69,27 +68,27 @@ public class XReadCommand implements IRedisCommandHandler{
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount, OutputStream outputStream) throws IOException {
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
         int currentIndex = startIndex;
+        synchronized (this) {
+            for (int i = startIndex; i < streamCount; i++) {
+                String key = args.get(i);
+                String id = args.get(i + streamCount - 1);
 
-        for (int i = startIndex; i < streamCount; i++) {
-            String key = args.get(i);
-            String id = args.get(i + streamCount - 1);
+                long rangeFrom = parseIdToRange(id);
 
-            long rangeFrom = parseIdToRange(id);
+                RedisStreams streamKey = Main.streams.get(key);
+                if (streamKey != null) {
+                    Map<String, KeyValue> values = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
+                    responseMap.put(key, values);
+                } else {
+                    responseMap.put(key, new LinkedHashMap<>()); // Handle missing stream key
+                }
 
-            RedisStreams streamKey = Main.streams.get(key);
-            if (streamKey != null) {
-                Map<String, KeyValue> values = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
-                responseMap.put(key, values);
-            } else {
-                responseMap.put(key, new LinkedHashMap<>()); // Handle missing stream key
             }
 
+            if (outputStream != null) {
+                sendArrayRESPresponseForXRead(outputStream, responseMap);
+            }
         }
-
-        if (outputStream != null) {
-            sendArrayRESPresponseForXRead(outputStream, responseMap);
-        }
-
         return responseMap;
     }
 
