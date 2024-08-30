@@ -18,26 +18,32 @@ public class XRangeCommand implements IRedisCommandHandler{
         String key = args.get(0);
         long rangeFrom = 0;
         long rangeTo = 0;
-        if(!args.get(1).equals("-") && !args.get(2).equals("+")) {
-            String[] idFromSplitArray = args.get(1).split("-");
-            String[] idToSplitArray = args.get(2).split("-");
-            rangeFrom = Long.parseLong(idFromSplitArray[0]) + Long.parseLong(idFromSplitArray[1]);
-            rangeTo = Long.parseLong(idToSplitArray[0]) + Long.parseLong(idToSplitArray[1]);
-        }else{
-            if(args.get(1).equals("-")){
-                String[] idToSplitArray = args.get(2).split("-");
-                rangeFrom = 0;
-                rangeTo = Long.parseLong(idToSplitArray[0]) + Long.parseLong(idToSplitArray[1]);
-            }else{
-                String[] idFromSplitArray = args.get(1).split("-");
-                rangeFrom = Long.parseLong(idFromSplitArray[0]) + Long.parseLong(idFromSplitArray[1]);
-                rangeTo = 0;
+
+        if (isSpecificRange(args)) {
+            rangeFrom = parseId(args.get(1));
+            rangeTo = parseId(args.get(2));
+        } else {
+            if (args.get(1).equals("-")) {
+                rangeTo = parseId(args.get(2));
+            } else {
+                rangeFrom = parseId(args.get(1));
             }
         }
+
         RedisStreams streamKey = Main.streams.get(key);
-        Map<String,KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesWithinStreamRange(rangeFrom,rangeTo);
+        Map<String, KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesWithinStreamRange(rangeFrom, rangeTo);
         sendArrayRESPresponse(outputStream, listOfValuesInStreamWithKey);
     }
+
+    private boolean isSpecificRange(List<String> args) {
+        return !args.get(1).equals("-") && !args.get(2).equals("+");
+    }
+
+    private long parseId(String id) {
+        String[] idParts = id.split("-");
+        return Long.parseLong(idParts[0]) + Long.parseLong(idParts[1]);
+    }
+
     public void sendArrayRESPresponse(OutputStream outputStream, Map<String, KeyValue> list) throws IOException {
         StringBuilder sb = new StringBuilder();
 

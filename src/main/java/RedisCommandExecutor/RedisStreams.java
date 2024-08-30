@@ -90,8 +90,6 @@ public class RedisStreams {
                 return Constants.EQUAL_OR_SMALLER;
             }
         }
-       // lastTimestamp = idTimestamp;
-
         return Constants.VALID;
     }
 
@@ -104,19 +102,16 @@ public class RedisStreams {
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
-            if(idFrom == 0){
-                if(id <= idTo){
-                    System.out.printf("****** IN Getting list - Range : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
-                    list.put(entry.getKey(),entry.getValue());
-                }
-            }else if(idTo == 0){
-                if(id >= idFrom){
-                    System.out.printf("****** IN Getting list + Range : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
-                    list.put(entry.getKey(),entry.getValue());
-                }
-            }else if(id >= idFrom && id <= idTo){
-                System.out.printf("****** IN Getting list : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
-                list.put(entry.getKey(),entry.getValue());
+            boolean withinRange = (idFrom == 0 && id <= idTo) ||
+                    (idTo == 0 && id >= idFrom) ||
+                    (id >= idFrom && id <= idTo);
+
+            if (withinRange) {
+                System.out.printf("****** IN Getting list : %s____%s------%s%n",
+                        entry.getKey(),
+                        entry.getValue().getKey(),
+                        entry.getValue().getValue());
+                list.put(entry.getKey(), entry.getValue());
             }
         }
         return list;
