@@ -16,11 +16,12 @@ public class XReadCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         Map<String,Map<String,KeyValue>> responseMap = new HashMap<>();
-        int numberOfStreams = args.size() / 2;
+        int numberOfArgs = args.size();
+        int k = numberOfArgs / 2 + 1;
 
-        for (int i = 0; i < numberOfStreams; i++) {
-            String key = args.get(2 * i + 1);
-            String id = args.get(2 * i + 2);
+        for (int i = 1; i <= numberOfArgs / 2; i++) {
+            String key = args.get(i);
+            String id = args.get(k);
 
             long rangeFrom = 0;
             String[] idParts = id.split("-");
@@ -30,6 +31,7 @@ public class XReadCommand implements IRedisCommandHandler{
             Map<String,KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
 
             responseMap.put(key, listOfValuesInStreamWithKey);//adding stream key and all values from that stream
+            k++;
         }
 
         sendArrayRESPresponseForXRead(outputStream, responseMap);
