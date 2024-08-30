@@ -16,10 +16,24 @@ public class XRangeCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         String key = args.get(0);
-        String[] idFromSplitArray = args.get(1).split("-");
-        String[] idToSplitArray = args.get(2).split("-");
-        long rangeFrom = Long.parseLong(idFromSplitArray[0]) + Long.parseLong(idFromSplitArray[1]);
-        long rangeTo = Long.parseLong(idToSplitArray[0]) + Long.parseLong(idToSplitArray[1]);
+        long rangeFrom = 0;
+        long rangeTo = 0;
+        if(!args.get(1).equals("-") && !args.get(2).equals("+")) {
+            String[] idFromSplitArray = args.get(1).split("-");
+            String[] idToSplitArray = args.get(2).split("-");
+            rangeFrom = Long.parseLong(idFromSplitArray[0]) + Long.parseLong(idFromSplitArray[1]);
+            rangeTo = Long.parseLong(idToSplitArray[0]) + Long.parseLong(idToSplitArray[1]);
+        }else{
+            if(args.get(1).equals("-")){
+                String[] idToSplitArray = args.get(2).split("-");
+                rangeFrom = 0;
+                rangeTo = Long.parseLong(idToSplitArray[0]) + Long.parseLong(idToSplitArray[1]);
+            }else{
+                String[] idFromSplitArray = args.get(1).split("-");
+                rangeFrom = Long.parseLong(idFromSplitArray[0]) + Long.parseLong(idFromSplitArray[1]);
+                rangeTo = 0;
+            }
+        }
         RedisStreams streamKey = Main.streams.get(key);
         Map<String,KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesWithinStreamRange(rangeFrom,rangeTo);
         sendArrayRESPresponse(outputStream, listOfValuesInStreamWithKey);

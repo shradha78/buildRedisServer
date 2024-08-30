@@ -10,14 +10,12 @@ public class RedisStreams {
     private long lastTimestamp;
     private long sequenceNumber;
     private String lastStreamId = "";
-    private final Map<Long, Long> sequenceNumbersByTimestamp ;
 
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
         this.streamEntries = new LinkedHashMap<>();
         this.lastTimestamp = System.currentTimeMillis();
         this.sequenceNumber = 0;
-        this.sequenceNumbersByTimestamp = new HashMap<>();
     }
 
     public String addEntryToStreamID(String id, KeyValue entry) {
@@ -104,7 +102,17 @@ public class RedisStreams {
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
-            if(id >= idFrom && id <= idTo){
+            if(idFrom == 0){
+                if(id <= idTo){
+                    System.out.printf("****** IN Getting list - Range : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
+                    list.put(entry.getKey(),entry.getValue());
+                }
+            }else if(idTo == 0){
+                if(id >= idFrom){
+                    System.out.printf("****** IN Getting list + Range : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
+                    list.put(entry.getKey(),entry.getValue());
+                }
+            }else if(id >= idFrom && id <= idTo){
                 System.out.printf("****** IN Getting list : " + entry.getKey() + "____" +  entry.getValue().getKey() +"------" + entry.getValue().getValue() + "\n");
                 list.put(entry.getKey(),entry.getValue());
             }
