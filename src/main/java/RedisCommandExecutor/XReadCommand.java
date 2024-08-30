@@ -14,27 +14,26 @@ import static RedisCommandExecutor.XRangeCommand.*;
 public class XReadCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        Map<String,Map<String,KeyValue>> responseMap = new LinkedHashMap<>();
-        int start = 1;
+        int startIndex = 1;
         int numberOfArgs = args.size();
-        int k = numberOfArgs / 2;
-        int actualStreams = numberOfArgs/2;
+        int streamCount = numberOfArgs / 2;
         boolean isBlocked = false;
         long blockTimeout = 0;
-        if(args.get(0).equalsIgnoreCase("BLOCK")){
-            start = 3;
-            actualStreams = (numberOfArgs - 3)/2 + 2;
-            k = start + actualStreams - 2;
+
+        // Check if BLOCK keyword is present and adjust arguments parsing
+        if (args.get(0).equalsIgnoreCase("BLOCK")) {
+            startIndex = 3;
+            streamCount = (numberOfArgs - 3) / 2 + 1;
             blockTimeout = Long.parseLong(args.get(1));
             isBlocked = true;
         }
 
         if (isBlocked) {
             // Handle blocking with timeout
-            handleBlockingXRead(args, start, k, blockTimeout, outputStream);
+            handleBlockingXRead(args, startIndex, streamCount, blockTimeout, outputStream);
         } else {
             // Handle non-blocking XREAD
-            processStreams(args, start, k, outputStream);
+            processStreams(args, startIndex, streamCount, outputStream);
         }
     }
 
