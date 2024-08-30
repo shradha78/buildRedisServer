@@ -12,7 +12,7 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
-    private static final long POLL_INTERVAL_MS = 100;
+    private static final long POLL_INTERVAL_MS = 1;
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int startIndex = 1;
@@ -51,7 +51,9 @@ public class XReadCommand implements IRedisCommandHandler{
             }
 
             try {
-                Thread.sleep(POLL_INTERVAL_MS); // Short delay before rechecking
+                synchronized (this) {
+                    Thread.sleep(POLL_INTERVAL_MS);
+                }// Short delay before rechecking
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // Restore interrupt status
                 System.out.printf("Thread interrupted during BLOCK wait");
