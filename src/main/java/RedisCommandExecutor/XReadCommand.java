@@ -15,7 +15,7 @@ import static RedisCommandExecutor.XRangeCommand.*;
 public class XReadCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        Map<String, List<KeyValue>> responseMap = new HashMap<>();
+        Map<String,Map<String,KeyValue>> responseMap = new HashMap<>();
         int numberOfStreams = args.size() / 2;
 
         for (int i = 0; i < numberOfStreams; i++) {
@@ -27,7 +27,7 @@ public class XReadCommand implements IRedisCommandHandler{
             rangeFrom = Long.parseLong(idParts[0]) + Long.parseLong(idParts[1]);
 
             RedisStreams streamKey = Main.streams.get(key);
-            List<KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
+            Map<String,KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
 
             responseMap.put(key, listOfValuesInStreamWithKey);
         }
@@ -35,16 +35,16 @@ public class XReadCommand implements IRedisCommandHandler{
         sendArrayRESPresponseForXRead(outputStream, responseMap);
     }
 
-    public static void sendArrayRESPresponseForXRead(OutputStream outputStream, Map<String, List<KeyValue>> streamEntries) throws IOException {
+    public static void sendArrayRESPresponseForXRead(OutputStream outputStream, Map<String,Map<String,KeyValue>> streamEntries) throws IOException {
         StringBuilder sb = new StringBuilder();
         System.out.println("WRITING RESPONSE IN XREAD");
 
         // Start with the array header indicating the number of streams
         sb.append("*").append(streamEntries.size()).append("\r\n");
 
-        for (Map.Entry<String, List<KeyValue>> streamEntry : streamEntries.entrySet()) {
+        for (Map.Entry<String,Map<String,KeyValue>> streamEntry : streamEntries.entrySet()) {
             String streamKey = streamEntry.getKey();
-            List<KeyValue> keyValuePairs = streamEntry.getValue();
+            Map<String,KeyValue> idKeyValuePairs = streamEntry.getValue();
 
             // Add the stream key and the number of entries
             sb.append("*2").append("\r\n");
@@ -54,12 +54,12 @@ public class XReadCommand implements IRedisCommandHandler{
             sb.append(streamKey).append("\r\n");
 
             // Start another array for the list of ID-field-value pairs
-            sb.append("*").append(keyValuePairs.size()).append("\r\n");
+            sb.append("*").append(idKeyValuePairs.size()).append("\r\n");
 
-            for (KeyValue kv : keyValuePairs) {
-                String id = kv.getKey(); // Assuming the key is used as the ID
-                String field = kv.getKey(); // Field should be the actual key
-                String value = kv.getValue();
+            for (Map.Entry<String,KeyValue> entry : idKeyValuePairs.entrySet()) {
+                String id = entry.getKey(); // Assuming the key is used as the ID
+                String field = entry.getValue().getKey(); // Field should be the actual key
+                String value = entry.getValue().getValue();
 
                 // Each entry starts with an array containing the ID and its field-value pair array
                 sb.append("*2").append("\r\n");
