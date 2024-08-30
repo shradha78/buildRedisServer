@@ -44,30 +44,21 @@ public class XReadCommand implements IRedisCommandHandler{
 
         while (System.currentTimeMillis() < endTime) {
             Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
-
-            try {
-                synchronized (this) {
-                    Thread.sleep(POLL_INTERVAL_MS);
-                }// Short delay before rechecking
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupt status
-                System.out.printf("Thread interrupted during BLOCK wait");
-                throw new IOException("Thread interrupted during BLOCK wait", e);
-            }
             if (!responseMap.isEmpty()) {
                 sendArrayRESPresponseForXRead(outputStream, responseMap);
                 return; // Exit after sending response
             }
 
-            try {
-                synchronized (this) {
-                    Thread.sleep(POLL_INTERVAL_MS);
-                }// Short delay before rechecking
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupt status
-                System.out.printf("Thread interrupted during BLOCK wait");
-                throw new IOException("Thread interrupted during BLOCK wait", e);
-            }
+//            try {
+//                synchronized (this) {
+//                    System.out.printf("Thread Sleep during BLOCK wait");
+//                    Thread.sleep(POLL_INTERVAL_MS);
+//                }// Short delay before rechecking
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt(); // Restore interrupt status
+//                System.out.printf("Thread interrupted during BLOCK wait");
+//                throw new IOException("Thread interrupted during BLOCK wait", e);
+//            }
         }
 
         // Send null response if no data was available
