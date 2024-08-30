@@ -117,8 +117,8 @@ public class RedisStreams {
         return list;
     }
 
-    public Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom){
-        Map<String,KeyValue> list = new HashMap<>();
+    public  List<KeyValue> getListOfAllValuesForXReadStream(long idFrom){
+        List<KeyValue> list = new ArrayList<>();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
@@ -129,7 +129,7 @@ public class RedisStreams {
                         entry.getKey(),
                         entry.getValue().getKey(),
                         entry.getValue().getValue());
-                list.put(entry.getKey(), entry.getValue());
+                list.add(new KeyValue(entry.getValue().getKey(), entry.getValue().getValue(),0));
             }
         }
         return list;
