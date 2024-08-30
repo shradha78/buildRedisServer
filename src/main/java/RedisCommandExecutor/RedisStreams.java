@@ -125,7 +125,7 @@ public class RedisStreams {
             boolean withinRange = (id > idFrom);
 
             if (withinRange) {
-                System.out.printf("****** IN Getting list : %s____%s------%s%n",
+                System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",
                         entry.getKey(),
                         entry.getValue().getKey(),
                         entry.getValue().getValue());
