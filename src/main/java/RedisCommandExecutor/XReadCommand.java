@@ -92,7 +92,7 @@ public class XReadCommand implements IRedisCommandHandler{
             if (outputStream != null) {
                 sendArrayRESPresponseForXRead(outputStream, responseMap);
             }
-        System.out.printf("Does response map has values ? " + responseMap.isEmpty() + "\n");
+        System.out.printf("Does response map has values ? " + (responseMap.isEmpty()?"No" : "Yes" )+ "\n");
 
         return responseMap;
     }
