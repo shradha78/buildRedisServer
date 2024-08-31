@@ -41,32 +41,37 @@ public class XReadCommand implements IRedisCommandHandler{
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
+        System.out.printf("XREAD blocking start time: %d, will timeout at: %d\n", startTime, endTime);
         Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
         boolean timeout = true;
 
         while (System.currentTimeMillis() < endTime) {
-            System.out.printf("Current Time =%d , end time =%d \n",System.currentTimeMillis(),endTime );
-            if (!responseMap.isEmpty()) {
-                System.out.printf("We get a response\n");
+            responseMap = processStreams(args, startIndex, streamCount, null);
+            long currentTime = System.currentTimeMillis();
+            System.out.printf("XREAD polling at: %d\n", currentTime);
+
+            if (responseMap != null && !responseMap.isEmpty()) {
                 timeout = false;
+                System.out.printf("XREAD found data at: %d\n", currentTime);
                 break;
             }
+
             try {
-                Thread.sleep(100);  // Reduced polling interval
+                Thread.sleep(POLL_INTERVAL_MS);
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupt status
+                Thread.currentThread().interrupt();
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             }
-
-            responseMap = processStreams(args, startIndex, streamCount, null);
         }
 
         // Send null response if no data was available and there was a timeout
         if (timeout) {
             System.out.printf("Timeout");
             sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+            return;
         } else {
             sendArrayRESPresponseForXRead(outputStream, responseMap);
+            return;
         }
     }
 
