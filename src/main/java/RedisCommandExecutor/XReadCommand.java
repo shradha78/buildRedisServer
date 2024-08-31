@@ -45,12 +45,14 @@ public class XReadCommand implements IRedisCommandHandler{
         boolean timeout = true;
 
         while (System.currentTimeMillis() < endTime) {
+            System.out.printf("Current Time =%d , end time =%d \n",System.currentTimeMillis(),endTime );
             if (!responseMap.isEmpty()) {
+                System.out.printf("We get a response\n");
                 timeout = false;
                 break;
             }
             try {
-                Thread.sleep(50);  // Reduced polling interval
+                Thread.sleep(100);  // Reduced polling interval
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // Restore interrupt status
                 throw new IOException("Thread interrupted during BLOCK wait", e);

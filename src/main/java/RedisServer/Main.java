@@ -112,8 +112,10 @@ public class Main {
             };
 
             if (redisCommandHandler.isBlockingCommand()) {
+                System.out.printf("Block thread taking the task \n");
                 blockingThreadPool.submit(task);
             } else {
+                System.out.printf("non blocking thread taking the task \n");
                 nonBlockingThreadPool.submit(task);
             }
         } else {
