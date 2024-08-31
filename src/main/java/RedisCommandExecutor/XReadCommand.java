@@ -78,6 +78,11 @@ public class XReadCommand implements IRedisCommandHandler{
 
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount, OutputStream outputStream) throws IOException {
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
+        System.out.printf("In Process Streams \n");
+        System.out.printf("Checking args here \n");
+        for(String s : args){
+            System.out.printf("agrs =%d\n",s);
+        }
         int currentIndex = startIndex;
             for (int i = startIndex; i < streamCount; i++) {
                 String key = args.get(i);
