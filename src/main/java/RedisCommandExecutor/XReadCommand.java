@@ -102,6 +102,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 RedisStreams streamKey = Main.streams.get(key);
                 if (streamKey != null) {
+                    System.out.printf("There's value for this key in stream \n");
                     Map<String, KeyValue> values = null;
                     try {
                         values = streamKey.getListOfAllValuesForXReadStream(rangeFrom, XaddCommand.writeSemaphore, XaddCommand.readSemaphore);
