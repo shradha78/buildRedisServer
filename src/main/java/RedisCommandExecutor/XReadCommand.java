@@ -46,9 +46,8 @@ public class XReadCommand implements IRedisCommandHandler{
         boolean timeout = true;
 
         while (System.currentTimeMillis() < endTime) {
-            synchronized (XReadCommand.class) {
-                responseMap = processStreams(args, startIndex, streamCount, null);
-            }
+
+            responseMap = processStreams(args, startIndex, streamCount, null);
             long currentTime = System.currentTimeMillis();
             System.out.printf("XREAD polling at: %d\n", currentTime);
 

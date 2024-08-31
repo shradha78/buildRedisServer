@@ -25,7 +25,9 @@ public class RedisStreams {
             id = processId(id);
         }
         System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
-        streamEntries.put(id,entry);
+        synchronized (RedisStreams.class) {
+            streamEntries.put(id, entry);
+        }
         lastStreamId = id;
         return id;
     }
@@ -97,7 +99,7 @@ public class RedisStreams {
         return lastStreamId;
     }
 
-    public Map<String,KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
+    public synchronized Map<String,KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
         Map<String,KeyValue> list = new HashMap<>();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
