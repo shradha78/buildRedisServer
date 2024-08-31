@@ -29,6 +29,7 @@ public class RedisStreams {
         writeSemaphore.acquire();
         streamEntries.put(id, entry);
         readSemaphore.release();
+        writeSemaphore.release();
         lastStreamId = id;
         return id;
     }
@@ -136,7 +137,6 @@ public class RedisStreams {
                 list.put(entry.getKey(), entry.getValue());
             }
         }
-        writeSemaphore.release();
         return list;
     }
 }
