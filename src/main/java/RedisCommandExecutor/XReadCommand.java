@@ -12,7 +12,7 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
-    private static final long POLL_INTERVAL_MS = 1000;
+    private static final long POLL_INTERVAL_MS = 100;
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int startIndex = 1;
@@ -46,7 +46,9 @@ public class XReadCommand implements IRedisCommandHandler{
         boolean timeout = true;
 
         while (System.currentTimeMillis() < endTime) {
-            responseMap = processStreams(args, startIndex, streamCount, null);
+            synchronized (XReadCommand.class) {
+                responseMap = processStreams(args, startIndex, streamCount, null);
+            }
             long currentTime = System.currentTimeMillis();
             System.out.printf("XREAD polling at: %d\n", currentTime);
 

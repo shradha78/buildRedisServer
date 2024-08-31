@@ -25,8 +25,9 @@ public class XaddCommand implements IRedisCommandHandler{
             handleInvalidId(validationResult, outputStream);
             return;
         }
-
-        streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
+        synchronized (XaddCommand.class) {
+            streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
+        }
         sendBulkStringResponse(outputStream, streamKeyId, "Stream Bulk String Output : ");
     }
 
