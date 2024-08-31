@@ -41,30 +41,31 @@ public class XReadCommand implements IRedisCommandHandler{
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
-        Map<String, Map<String, KeyValue>> responseMap;
+        Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
+        boolean timeout = true;
 
-        // Loop to keep checking for new data until timeout
         while (System.currentTimeMillis() < endTime) {
-            responseMap = processStreams(args, startIndex, streamCount, null);
-
             if (!responseMap.isEmpty()) {
-                sendArrayRESPresponseForXRead(outputStream, responseMap);
-                return; // Exit after sending response
+                timeout = false;
+                break;
             }
-
             try {
-                System.out.printf("Thread Sleep during BLOCK wait \n");
-                Thread.sleep(POLL_INTERVAL_MS);
+                Thread.sleep(50);  // Reduced polling interval
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // Restore interrupt status
-                System.out.printf("Thread interrupted during BLOCK wait");
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             }
+
+            responseMap = processStreams(args, startIndex, streamCount, null);
         }
 
         // Send null response if no data was available and there was a timeout
-        System.out.printf("timeoutttt");
-        sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+        if (timeout) {
+            System.out.printf("Timeout");
+            sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+        } else {
+            sendArrayRESPresponseForXRead(outputStream, responseMap);
+        }
     }
 
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount, OutputStream outputStream) throws IOException {
@@ -149,6 +150,10 @@ public class XReadCommand implements IRedisCommandHandler{
 
         // Write the entire response to the output stream
         outputStream.write(sb.toString().getBytes());
+    }
+
+    public boolean isBlockingCommand(){
+        return true;
     }
 
 }

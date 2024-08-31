@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
 
@@ -17,12 +18,20 @@ public class Main {
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
     public static HashMap<String, RedisStreams> streams;
+
+    private static final int BLOCKING_THREAD_POOL_SIZE = 5;
+    private static final int NON_BLOCKING_THREAD_POOL_SIZE = 10;
+
+    private static ExecutorService blockingThreadPool;
+    private static ExecutorService nonBlockingThreadPool;
     public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         int port = 6379;
+        blockingThreadPool = Executors.newFixedThreadPool(BLOCKING_THREAD_POOL_SIZE);
+        nonBlockingThreadPool = Executors.newFixedThreadPool(NON_BLOCKING_THREAD_POOL_SIZE);
        listenToPort(clientSocket, port);
     }
 
@@ -44,15 +53,15 @@ public class Main {
                 clientSocket = serverSocket.accept();
                 final Socket finalClientSocket = clientSocket;
                 //Socket finalClientSocket = clientSocket;
-                new Thread(() -> {
-                System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
+                nonBlockingThreadPool.submit(() -> {
                     try {
+                        System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
                         ClientSession session = new ClientSession();
-                        handlingClientCommands(finalClientSocket,session);
+                        handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }).start();
+                });
             }
         }catch (IOException e) {
           System.out.println("IOException: " + e.getMessage());
@@ -94,7 +103,19 @@ public class Main {
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
         System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
         if (redisCommandHandler != null) {
-            redisCommandHandler.execute(command.getListOfActions(), outputStream,session);
+            Runnable task = () -> {
+                try {
+                    redisCommandHandler.execute(command.getListOfActions(), outputStream, session);
+                } catch (IOException e) {
+                    System.err.println("Error executing command: " + e.getMessage());
+                }
+            };
+
+            if (redisCommandHandler.isBlockingCommand()) {
+                blockingThreadPool.submit(task);
+            } else {
+                nonBlockingThreadPool.submit(task);
+            }
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
         }
@@ -109,6 +130,10 @@ public class Main {
             }
         }
         queueOfCommandsForMultiAndExec.add(command);
+    }
 
+    public static void shutdown() {
+        nonBlockingThreadPool.shutdown();
+        blockingThreadPool.shutdown();
     }
 }
