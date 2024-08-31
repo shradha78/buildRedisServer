@@ -129,12 +129,15 @@ public class RedisStreams {
     public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
         readSemaphore.acquire();
         Map<String, KeyValue> list = new LinkedHashMap<>();
+        System.out.printf("In XREAD READING DATA ********** \n");
         try {
 
             for (Map.Entry<String, KeyValue> entry : streamEntries.entrySet()) {
                 String[] idSplit = entry.getKey().split("-");
                 long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
+                System.out.printf("Reading id =%d \n",id );
                 boolean withinRange = (id > idFrom);
+                System.out.printf("Value for withinRange =%d\n",withinRange);
 
                 if (withinRange) {
                     System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",
