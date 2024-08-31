@@ -14,7 +14,7 @@ import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
 
 public class XaddCommand implements IRedisCommandHandler{
     public static Semaphore writeSemaphore = new Semaphore(1);
-    public static Semaphore readSemaphore = new Semaphore(0);
+    public static Semaphore readSemaphore = new Semaphore(3);
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         String streamKey = args.get(0);

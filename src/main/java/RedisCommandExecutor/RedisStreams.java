@@ -20,17 +20,22 @@ public class RedisStreams {
     }
 
     public String addEntryToStreamID(String id, KeyValue entry, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
-        if (id.equals("*")) {
-            id = autoGenerateId();
-        } else {
-            id = processId(id);
-        }
-        System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
         writeSemaphore.acquire();
-        streamEntries.put(id, entry);
-        readSemaphore.release();
-        writeSemaphore.release();
-        lastStreamId = id;
+        try {
+            if (id.equals("*")) {
+                id = autoGenerateId();
+            } else {
+                id = processId(id);
+            }
+            System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
+            streamEntries.put(id, entry);
+            lastStreamId = id;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            writeSemaphore.release();
+        }
         return id;
     }
 
@@ -122,20 +127,25 @@ public class RedisStreams {
     }
 
     public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
-        Map<String,KeyValue> list = new LinkedHashMap<>();
         readSemaphore.acquire();
-        for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
-            String[] idSplit = entry.getKey().split("-");
-            long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
-            boolean withinRange = (id > idFrom);
+        Map<String, KeyValue> list = new LinkedHashMap<>();
+        try {
 
-            if (withinRange) {
-                System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",
-                        entry.getKey(),
-                        entry.getValue().getKey(),
-                        entry.getValue().getValue());
-                list.put(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, KeyValue> entry : streamEntries.entrySet()) {
+                String[] idSplit = entry.getKey().split("-");
+                long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
+                boolean withinRange = (id > idFrom);
+
+                if (withinRange) {
+                    System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",
+                            entry.getKey(),
+                            entry.getValue().getKey(),
+                            entry.getValue().getValue());
+                    list.put(entry.getKey(), entry.getValue());
+                }
             }
+        } finally {
+            readSemaphore.release();
         }
         return list;
     }
