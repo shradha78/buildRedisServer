@@ -42,6 +42,10 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
         System.out.printf("XREAD blocking start time: %d, will timeout at: %d\n", startTime, endTime);
+        System.out.printf("Checking args here in handleBlockingXRead \n");
+        for(String s : args){
+            System.out.printf("args =%d\n",s);
+        }
         Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
         boolean timeout = true;
 
@@ -81,12 +85,14 @@ public class XReadCommand implements IRedisCommandHandler{
         System.out.printf("In Process Streams \n");
         System.out.printf("Checking args here \n");
         for(String s : args){
-            System.out.printf("agrs =%d\n",s);
+            System.out.printf("args = %d\n",s);
         }
         int currentIndex = startIndex;
             for (int i = startIndex; i < streamCount; i++) {
+                System.out.printf("Checking if being processed here \n");
                 String key = args.get(i);
                 String id = args.get(i + streamCount - 1);
+                System.out.printf("key = %d , id = %d \n",key,id);
 
                 long rangeFrom = parseIdToRange(id);
 
