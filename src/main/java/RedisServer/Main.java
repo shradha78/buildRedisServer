@@ -88,6 +88,7 @@ public class Main {
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
                     queueCommands(command, session);
+                    processCommand(command,outputStream,session);//based on commands, it will process output
 //                    RedisCommand command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "1-0", "temperature", "36", "humidity", "95")));
 //                    processCommand(command, outputStream, session);//based on commands, it will process output
 //                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("BLOCK", "1000", "streams", "shradha", "1526985054069-0")));
