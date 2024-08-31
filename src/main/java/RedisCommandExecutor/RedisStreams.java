@@ -20,7 +20,7 @@ public class RedisStreams {
     }
 
     public String addEntryToStreamID(String id, KeyValue entry, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
-        writeSemaphore.acquire();
+        //writeSemaphore.acquire();
         try {
             if (id.equals("*")) {
                 id = autoGenerateId();
@@ -34,7 +34,7 @@ public class RedisStreams {
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            writeSemaphore.release();
+           // writeSemaphore.release();
         }
         return id;
     }
@@ -127,7 +127,7 @@ public class RedisStreams {
     }
 
     public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
-        readSemaphore.acquire();
+        //readSemaphore.acquire();
         Map<String, KeyValue> list = new LinkedHashMap<>();
         System.out.printf("In XREAD READING DATA ********** \n");
         try {
@@ -135,9 +135,9 @@ public class RedisStreams {
             for (Map.Entry<String, KeyValue> entry : streamEntries.entrySet()) {
                 String[] idSplit = entry.getKey().split("-");
                 long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
-                System.out.printf("Reading id =%d \n",id );
+                //System.out.printf("Reading id =%l \n",id );
                 boolean withinRange = (id > idFrom);
-                System.out.printf("Value for withinRange =%d\n",withinRange);
+                System.out.printf("Value for withinRange =%b\n",withinRange);
 
                 if (withinRange) {
                     System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",
@@ -148,7 +148,7 @@ public class RedisStreams {
                 }
             }
         } finally {
-            readSemaphore.release();
+          //  readSemaphore.release();
         }
         return list;
     }
