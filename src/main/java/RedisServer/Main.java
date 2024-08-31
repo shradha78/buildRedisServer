@@ -17,22 +17,23 @@ public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
-    public static HashMap<String, RedisStreams> streams;
+    public static Map<String, RedisStreams> streams;
 
     private static final int BLOCKING_THREAD_POOL_SIZE = 5;
     private static final int NON_BLOCKING_THREAD_POOL_SIZE = 10;
 
     private static ExecutorService blockingThreadPool;
     private static ExecutorService nonBlockingThreadPool;
-    public static void main(String[] args){
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
-    System.out.println("Logs from your program will appear here!");
+
+    public static void main(String[] args) {
+        // You can use print statements as follows for debugging, they'll be visible when running tests.
+        System.out.println("Logs from your program will appear here!");
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         int port = 6379;
         blockingThreadPool = Executors.newFixedThreadPool(BLOCKING_THREAD_POOL_SIZE);
         nonBlockingThreadPool = Executors.newFixedThreadPool(NON_BLOCKING_THREAD_POOL_SIZE);
-       listenToPort(clientSocket, port);
+        listenToPort(clientSocket, port);
     }
 
     private static void listenToPort(Socket clientSocket, int port) {
@@ -63,38 +64,39 @@ public class Main {
                     }
                 });
             }
-        }catch (IOException e) {
-          System.out.println("IOException: " + e.getMessage());
-        } finally {
-          try {
-            if (clientSocket != null) {
-              clientSocket.close();
-            }
-          } catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
-          }
+        } finally {
+            try {
+                if (clientSocket != null) {
+                    clientSocket.close();
+                }
+            } catch (IOException e) {
+                System.out.println("IOException: " + e.getMessage());
+            }
         }
     }
-    private static void handlingClientCommands(Socket clientSocket, ClientSession session)  throws IOException{
+
+    private static void handlingClientCommands(Socket clientSocket, ClientSession session) throws IOException {
 
         try {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
             OutputStream outputStream = clientSocket.getOutputStream();
-            while(true){
-                try{
+            while (true) {
+                try {
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
-                    queueCommands(command,session);
-                    processCommand(command,outputStream,session);//based on commands, it will process output
-                }catch (IOException e){
+                    queueCommands(command, session);
+                    processCommand(command, outputStream, session);//based on commands, it will process output
+                } catch (IOException e) {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                     break;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             clientSocket.close();
         }
     }

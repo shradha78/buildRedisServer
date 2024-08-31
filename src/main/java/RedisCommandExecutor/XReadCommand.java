@@ -42,7 +42,7 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
         System.out.printf("XREAD blocking start time: %d, will timeout at: %d\n", startTime, endTime);
-        System.out.printf("Checking args here in handleBlockingXRead \n");
+        System.out.printf("Checking args here in handleBlockingXRead  \n");
         for(String s : args){
             System.out.printf("args =%d\n",s);
         }
@@ -69,7 +69,6 @@ public class XReadCommand implements IRedisCommandHandler{
             }
         }
 
-        // Send null response if no data was available and there was a timeout
         if (timeout) {
             System.out.printf("Timeout");
             sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
@@ -106,7 +105,7 @@ public class XReadCommand implements IRedisCommandHandler{
                     }
                     responseMap.put(key, values);
                 } else {
-                    responseMap.put(key, new LinkedHashMap<>()); // Handle missing stream key
+                    responseMap.put(key, new LinkedHashMap<>());
                 }
 
             }
@@ -136,15 +135,11 @@ public class XReadCommand implements IRedisCommandHandler{
         for (Map.Entry<String,Map<String,KeyValue>> streamEntry : streamEntries.entrySet()) {
             String streamKey = streamEntry.getKey();
             Map<String,KeyValue> idKeyValuePairs = streamEntry.getValue();
-
-            // Add the stream key and the number of entries
             sb.append("*2").append("\r\n");
 
-            // Add the stream key as a bulk string
             sb.append("$").append(streamKey.length()).append("\r\n");
             sb.append(streamKey).append("\r\n");
 
-            // Start another array for the list of ID-field-value pairs
             sb.append("*").append(idKeyValuePairs.size()).append("\r\n");
 
             for (Map.Entry<String,KeyValue> entry : idKeyValuePairs.entrySet()) {
@@ -152,21 +147,17 @@ public class XReadCommand implements IRedisCommandHandler{
                 String field = entry.getValue().getKey(); // Field should be the actual key
                 String value = entry.getValue().getValue();
 
-                // Each entry starts with an array containing the ID and its field-value pair array
+
                 sb.append("*2").append("\r\n");
 
-                // Add the ID as a bulk string
                 sb.append("$").append(id.length()).append("\r\n");
                 sb.append(id).append("\r\n");
 
-                // Add the field-value pair array
                 sb.append("*2").append("\r\n");
 
-                // Add the field as a bulk string
                 sb.append("$").append(field.length()).append("\r\n");
                 sb.append(field).append("\r\n");
 
-                // Add the value as a bulk string
                 sb.append("$").append(value.length()).append("\r\n");
                 sb.append(value).append("\r\n");
             }
