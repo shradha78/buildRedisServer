@@ -73,7 +73,6 @@ public class XReadCommand implements IRedisCommandHandler{
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount, OutputStream outputStream) throws IOException {
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
         int currentIndex = startIndex;
-        synchronized (this) {
             for (int i = startIndex; i < streamCount; i++) {
                 String key = args.get(i);
                 String id = args.get(i + streamCount - 1);
@@ -93,7 +92,8 @@ public class XReadCommand implements IRedisCommandHandler{
             if (outputStream != null) {
                 sendArrayRESPresponseForXRead(outputStream, responseMap);
             }
-        }
+        System.out.printf("Does response map has values ? " + responseMap.isEmpty() + "\n");
+
         return responseMap;
     }
 
