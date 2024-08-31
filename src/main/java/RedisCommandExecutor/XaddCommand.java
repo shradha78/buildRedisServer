@@ -7,11 +7,14 @@ import RedisServer.Main;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
 
 public class XaddCommand implements IRedisCommandHandler{
+    public static Semaphore writeSemaphore = new Semaphore(1);
+    public static Semaphore readSemaphore = new Semaphore(0);
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         String streamKey = args.get(0);
@@ -25,9 +28,12 @@ public class XaddCommand implements IRedisCommandHandler{
             handleInvalidId(validationResult, outputStream);
             return;
         }
-        synchronized (XaddCommand.class) {
-            streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
+        try {
+            streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded, writeSemaphore,readSemaphore);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
         sendBulkStringResponse(outputStream, streamKeyId, "Stream Bulk String Output : ");
     }
 

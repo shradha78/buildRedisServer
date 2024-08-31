@@ -3,6 +3,7 @@ package RedisCommandExecutor;
 import RedisServer.KeyValue;
 
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class RedisStreams {
     private final String streamKey;
@@ -18,16 +19,16 @@ public class RedisStreams {
         this.sequenceNumber = 0;
     }
 
-    public String addEntryToStreamID(String id, KeyValue entry) {
+    public String addEntryToStreamID(String id, KeyValue entry, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
         if (id.equals("*")) {
             id = autoGenerateId();
         } else {
             id = processId(id);
         }
         System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
-        synchronized (RedisStreams.class) {
-            streamEntries.put(id, entry);
-        }
+        writeSemaphore.acquire();
+        streamEntries.put(id, entry);
+        readSemaphore.release();
         lastStreamId = id;
         return id;
     }
@@ -99,7 +100,7 @@ public class RedisStreams {
         return lastStreamId;
     }
 
-    public synchronized Map<String,KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
+    public Map<String,KeyValue> getListOfAllValuesWithinStreamRange(long idFrom, long idTo){
         Map<String,KeyValue> list = new HashMap<>();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
@@ -119,8 +120,9 @@ public class RedisStreams {
         return list;
     }
 
-    public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom){
+    public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
         Map<String,KeyValue> list = new LinkedHashMap<>();
+        readSemaphore.acquire();
         for(Map.Entry<String, KeyValue> entry : streamEntries.entrySet()){
             String[] idSplit = entry.getKey().split("-");
             long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
@@ -134,6 +136,7 @@ public class RedisStreams {
                 list.put(entry.getKey(), entry.getValue());
             }
         }
+        writeSemaphore.release();
         return list;
     }
 }

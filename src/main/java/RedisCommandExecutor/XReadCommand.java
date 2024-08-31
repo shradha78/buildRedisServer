@@ -87,7 +87,12 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 RedisStreams streamKey = Main.streams.get(key);
                 if (streamKey != null) {
-                    Map<String, KeyValue> values = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
+                    Map<String, KeyValue> values = null;
+                    try {
+                        values = streamKey.getListOfAllValuesForXReadStream(rangeFrom, XaddCommand.writeSemaphore, XaddCommand.readSemaphore);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     responseMap.put(key, values);
                 } else {
                     responseMap.put(key, new LinkedHashMap<>()); // Handle missing stream key
