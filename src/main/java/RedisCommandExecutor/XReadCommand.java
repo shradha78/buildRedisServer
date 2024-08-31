@@ -25,7 +25,7 @@ public class XReadCommand implements IRedisCommandHandler{
         if (args.get(0).equalsIgnoreCase("BLOCK")) {
             startIndex = 3;
             streamCount = (numberOfArgs - 3) / 2 + 1;
-            blockTimeout = Long.parseLong(args.get(1));
+            blockTimeout = 1000 * Long.parseLong(args.get(1));
             isBlocked = true;
         }
 
