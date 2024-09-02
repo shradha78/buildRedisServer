@@ -17,7 +17,7 @@ public class XReadCommand implements IRedisCommandHandler{
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int startIndex = 1;
         int numberOfArgs = args.size();
-        int streamCount = numberOfArgs / 2;
+        int streamCount = numberOfArgs / 2 ;
         boolean isBlocked = false;
         long blockTimeout = 0;
         int streamCountPairs = streamCount / 2;
@@ -28,7 +28,7 @@ public class XReadCommand implements IRedisCommandHandler{
             streamCount = (numberOfArgs - 3);
             blockTimeout = Long.parseLong(args.get(1));
             isBlocked = true;
-            streamCountPairs = streamCount / 2;
+            streamCountPairs = streamCount / 2 - 1;
         }
 
         if (isBlocked) {
@@ -36,7 +36,8 @@ public class XReadCommand implements IRedisCommandHandler{
             handleBlockingXRead(args, startIndex, streamCountPairs, blockTimeout, outputStream);
         } else {
             // Handle non-blocking XREAD
-            processStreams(args, startIndex, streamCount, outputStream);
+            Map<String, Map<String, KeyValue>> responseMap =  processStreams(args, startIndex, streamCount, 0,outputStream);
+            sendArrayRESPresponseForXRead(outputStream, responseMap);
         }
     }
 
@@ -48,23 +49,24 @@ public class XReadCommand implements IRedisCommandHandler{
 //        for(String s : args){
 //            System.out.printf("args =%d\n",s);
 //        }
-        Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
+    //    Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
+        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
         boolean timeout = true;
 
         System.out.println("OUTSIDE WHILE LOOP");
-        while (System.currentTimeMillis() < endTime) {
+        while (startTime < endTime) {
 
             System.out.println("BEFORE process streams.......");
-            responseMap = processStreams(args, startIndex, streamCount, null);
+            responseMap = processStreams(args, startIndex, streamCount, 3,null);
             long currentTime = System.currentTimeMillis();
             System.out.printf("XREAD polling at: %d\n", currentTime);
 
             if (responseMap != null && !responseMap.isEmpty()) {
                 timeout = false;
-                System.out.printf("XREAD found data at: %d\n", currentTime);
+                System.out.printf("XREAD found data at: "+ currentTime +"\n");
                 break;
             }
-
+            startTime = System.currentTimeMillis();
             try {
                 System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis());
                 Thread.sleep(POLL_INTERVAL_MS);
@@ -72,6 +74,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 Thread.currentThread().interrupt();
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             }
+
         }
 
         if (timeout) {
@@ -84,18 +87,19 @@ public class XReadCommand implements IRedisCommandHandler{
         }
     }
 
-    private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount, OutputStream outputStream) throws IOException {
+    private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount,int k, OutputStream outputStream) throws IOException {
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
         System.out.printf("In Process Streams \n");
-        System.out.printf("Checking args here \n");
 //        for(String s : args){
 //            System.out.printf("args = %d\n",s);
 //        }
         int currentIndex = startIndex;
-            for (int i = 0; i < streamCount; i++) {
+        String key = "";
+        String id = "";
+            for (int i = startIndex; i <= streamCount; i++) {
                 System.out.printf("Checking if being processed here \n");
-                String key = args.get(i + 3);
-                String id = args.get(i + 3 + streamCount);
+                key = args.get(i + k);
+                id = args.get(i + k + streamCount);
                 System.out.printf("key = %s , id = %s \n",key,id);
 
                 long rangeFrom = parseIdToRange(id);
@@ -110,8 +114,6 @@ public class XReadCommand implements IRedisCommandHandler{
                         e.printStackTrace();
                     }
                     responseMap.put(key, values);
-                } else {
-                    responseMap.put(key, new LinkedHashMap<>());
                 }
 
             }
@@ -152,7 +154,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 String id = entry.getKey(); // Assuming the key is used as the ID
                 String field = entry.getValue().getKey(); // Field should be the actual key
                 String value = entry.getValue().getValue();
-
+                System.out.printf("In Writing response --> id = %s , field = %s, value =%s\n",id,field,value);
 
                 sb.append("*2").append("\r\n");
 
@@ -168,13 +170,13 @@ public class XReadCommand implements IRedisCommandHandler{
                 sb.append(value).append("\r\n");
             }
         }
-
+        System.out.printf("OUTPUT --> " + sb.toString());
         // Write the entire response to the output stream
         outputStream.write(sb.toString().getBytes());
     }
 
     public boolean isBlockingCommand(){
-        return true;
+        return false;
     }
 
 }

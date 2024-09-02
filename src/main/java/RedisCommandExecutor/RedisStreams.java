@@ -14,7 +14,7 @@ public class RedisStreams {
 
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
-        this.streamEntries = new LinkedHashMap<>();
+        this.streamEntries = Collections.synchronizedMap(new LinkedHashMap<>());
         this.lastTimestamp = 0;
         this.sequenceNumber = 0;
     }
@@ -137,7 +137,7 @@ public class RedisStreams {
                 long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
                 //System.out.printf("Reading id =%l \n",id );
                 boolean withinRange = (id > idFrom);
-                System.out.printf("Value for withinRange =%b\n",withinRange);
+                System.out.printf("Value for withinRange = " +withinRange + "\n");
 
                 if (withinRange) {
                     System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",

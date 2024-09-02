@@ -19,11 +19,6 @@ public class Main {
     public static HashMap<String, KeyValue> storeKeyValue;
     public static Map<String, RedisStreams> streams;
 
-    private static final int BLOCKING_THREAD_POOL_SIZE = 5;
-    private static final int NON_BLOCKING_THREAD_POOL_SIZE = 10;
-
-    private static ExecutorService blockingThreadPool;
-    private static ExecutorService nonBlockingThreadPool;
 
     public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -31,9 +26,20 @@ public class Main {
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         int port = 6379;
-        blockingThreadPool = Executors.newFixedThreadPool(BLOCKING_THREAD_POOL_SIZE);
-        nonBlockingThreadPool = Executors.newFixedThreadPool(NON_BLOCKING_THREAD_POOL_SIZE);
-        listenToPort(clientSocket, port);
+
+       listenToPort(clientSocket, port);
+
+//        //Debug
+//        redisCommandParser = new RedisCommandParser();
+//        redisProtocolParser = new RedisProtocolParser();
+//        storeKeyValue = new HashMap<>();
+//        streams = new HashMap<>();
+//        try {
+//            handlingClientCommands(null, null);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
     private static void listenToPort(Socket clientSocket, int port) {
@@ -41,7 +47,7 @@ public class Main {
         redisCommandParser = new RedisCommandParser();
         redisProtocolParser = new RedisProtocolParser();
         storeKeyValue = new HashMap<>();
-        streams = new HashMap<>();
+        streams = new ConcurrentHashMap<>();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -54,15 +60,16 @@ public class Main {
                 clientSocket = serverSocket.accept();
                 final Socket finalClientSocket = clientSocket;
                 //Socket finalClientSocket = clientSocket;
-                nonBlockingThreadPool.submit(() -> {
+                new Thread(() -> {
                     try {
                         System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
                         ClientSession session = new ClientSession();
+//                        handlingClientCommands(finalClientSocket, session);
                         handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                });
+                }).start();
             }
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
@@ -83,21 +90,25 @@ public class Main {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
             OutputStream outputStream = clientSocket.getOutputStream();
+//            OutputStream outputStream = null;
             while (true) {
                 try {
-                    List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
-                    RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
-                    queueCommands(command, session);
-                    processCommand(command,outputStream,session);//based on commands, it will process output
-//                    RedisCommand command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "1-0", "temperature", "36", "humidity", "95")));
+//                    List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
+//                    RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
+//                    queueCommands(command, session);
+//                    processCommand(command,outputStream,session);//based on commands, it will process output
+                    //Debug
+                    RedisCommand command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-1", "temperature", "36")));
+                    processCommand(command, outputStream, session);//based on commands, it will process output
+//                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("BLOCK", "1000", "streams", "shradha", "0-1")));
 //                    processCommand(command, outputStream, session);//based on commands, it will process output
-//                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("BLOCK", "1000", "streams", "shradha", "1526985054069-0")));
-//                    processCommand(command, outputStream, session);//based on commands, it will process output
-//                    command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "1-1", "temperature", "36", "humidity", "95")));
-//                    processCommand(command, outputStream, session);//based on commands, it will process output
+                    command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-2", "temperature", "40")));
+                    processCommand(command, outputStream, session);//based on commands, it will process output
+                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("streams", "shradha", "0-1")));
+                    processCommand(command, outputStream, session);//br
                 } catch (IOException e) {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
-                    break;
+                   break;
                 }
             }
         } catch (IOException e) {
@@ -111,21 +122,7 @@ public class Main {
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
         System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
         if (redisCommandHandler != null) {
-            Runnable task = () -> {
-                try {
-                    redisCommandHandler.execute(command.getListOfActions(), outputStream, session);
-                } catch (IOException e) {
-                    System.err.println("Error executing command: " + e.getMessage());
-                }
-            };
-
-            if (redisCommandHandler.isBlockingCommand()) {
-                System.out.printf("Block thread taking the task \n");
-                blockingThreadPool.submit(task);
-            } else {
-                System.out.printf("non blocking thread taking the task \n");
-                nonBlockingThreadPool.submit(task);
-            }
+            redisCommandHandler.execute(command.getListOfActions(), outputStream, session);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
         }
@@ -142,8 +139,4 @@ public class Main {
         queueOfCommandsForMultiAndExec.add(command);
     }
 
-    public static void shutdown() {
-        nonBlockingThreadPool.shutdown();
-        blockingThreadPool.shutdown();
-    }
 }
