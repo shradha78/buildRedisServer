@@ -66,7 +66,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 System.out.printf("XREAD found data at: "+ currentTime +"\n");
                 break;
             }
-            startTime = System.currentTimeMillis();
+
             try {
                 System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis());
                 Thread.sleep(POLL_INTERVAL_MS);
@@ -74,6 +74,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 Thread.currentThread().interrupt();
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             }
+            startTime = System.currentTimeMillis();
 
         }
 
