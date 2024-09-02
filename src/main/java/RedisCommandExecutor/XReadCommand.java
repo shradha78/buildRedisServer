@@ -54,7 +54,7 @@ public class XReadCommand implements IRedisCommandHandler{
         boolean timeout = true;
 
         System.out.println("OUTSIDE WHILE LOOP");
-        while (startTime < endTime) {
+        while (System.currentTimeMillis() < endTime) {
 
             System.out.println("BEFORE process streams.......");
             responseMap = processStreams(args, startIndex, streamCount, 3,null);
