@@ -93,19 +93,19 @@ public class Main {
 //            OutputStream outputStream = null;
             while (true) {
                 try {
-//                    List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
-//                    RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
-//                    queueCommands(command, session);
-//                    processCommand(command,outputStream,session);//based on commands, it will process output
+                    List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
+                    RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
+                    queueCommands(command, session);
+                    processCommand(command,outputStream,session);//based on commands, it will process output
                     //Debug
-                    RedisCommand command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-1", "temperature", "36")));
-                    processCommand(command, outputStream, session);//based on commands, it will process output
-//                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("BLOCK", "1000", "streams", "shradha", "0-1")));
+//                    RedisCommand command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-1", "temperature", "36")));
 //                    processCommand(command, outputStream, session);//based on commands, it will process output
-                    command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-2", "temperature", "40")));
-                    processCommand(command, outputStream, session);//based on commands, it will process output
-                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("streams", "shradha", "0-1")));
-                    processCommand(command, outputStream, session);//br
+////                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("BLOCK", "1000", "streams", "shradha", "0-1")));
+////                    processCommand(command, outputStream, session);//based on commands, it will process output
+//                    command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-2", "temperature", "40")));
+//                    processCommand(command, outputStream, session);//based on commands, it will process output
+//                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("streams", "shradha", "0-1")));
+//                    processCommand(command, outputStream, session);//br
                 } catch (IOException e) {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                    break;
