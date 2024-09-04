@@ -47,7 +47,7 @@ public class Main {
         redisCommandParser = new RedisCommandParser();
         redisProtocolParser = new RedisProtocolParser();
         storeKeyValue = new HashMap<>();
-        streams = new LinkedHashMap<>();
+        streams = new ConcurrentHashMap<>();
 
         try {
             serverSocket = new ServerSocket(port);
