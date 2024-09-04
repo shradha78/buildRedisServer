@@ -46,7 +46,7 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
         System.out.println("XREAD blocking start time: %d, will timeout at: \n" + startTime + " " + endTime + "\n");
-        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
+        Map<String, Map<String, KeyValue>> responseMap = null;
         boolean timeout = true;
 
         System.out.println("OUTSIDE WHILE LOOP");
@@ -62,8 +62,6 @@ public class XReadCommand implements IRedisCommandHandler{
                 System.out.printf("XREAD found data at: "+ currentTime +"\n");
                 break;
             }
-
-            startTime = System.currentTimeMillis();
             try {
                 System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis());
                 Thread.sleep(POLL_INTERVAL_MS);
@@ -71,6 +69,8 @@ public class XReadCommand implements IRedisCommandHandler{
                 Thread.currentThread().interrupt();
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             }
+
+            startTime = System.currentTimeMillis();
         }
                 if (timeout) {
                     System.out.println("Timeoutttttttt");
