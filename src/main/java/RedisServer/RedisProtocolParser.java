@@ -8,7 +8,7 @@ import java.util.List;
 public class RedisProtocolParser {
     public List<String> parseRESPMessage(BufferedReader br) throws IOException {
         List<String> mainMessageParts = new ArrayList<>();
-
+        System.out.printf("IN parsing RESP Message\n");
         String line = br.readLine();
         if(line == null || !line.startsWith("*")){
             throw new IOException("Invalid RESP message");

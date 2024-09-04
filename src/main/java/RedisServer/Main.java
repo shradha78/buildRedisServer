@@ -122,7 +122,7 @@ public class Main {
 
     public static void processCommand(RedisCommand command, OutputStream outputStream, ClientSession session) throws IOException {
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
-        System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
+        System.out.printf("Checking value for redis command handler %s\n", redisCommandHandler != null ? redisCommandHandler.getClass().getName() : "null");
         if (redisCommandHandler != null) {
             redisCommandHandler.execute(command.getListOfActions(), outputStream, session);
         } else {
@@ -139,6 +139,7 @@ public class Main {
             }
         }
         queueOfCommandsForMultiAndExec.add(command);
+        System.out.printf("Queued command: %s\n", command.getCommand());
     }
 
 }
