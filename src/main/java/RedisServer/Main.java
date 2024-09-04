@@ -47,7 +47,7 @@ public class Main {
         redisCommandParser = new RedisCommandParser();
         redisProtocolParser = new RedisProtocolParser();
         storeKeyValue = new HashMap<>();
-        streams = new ConcurrentHashMap<>();
+        streams = new LinkedHashMap<>();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -90,9 +90,11 @@ public class Main {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
             OutputStream outputStream = clientSocket.getOutputStream();
+            PrintWriter printWriter = new PrintWriter(outputStream, true);
 //            OutputStream outputStream = null;
             while (true) {
                 try {
+                    System.out.printf("Sending commands for parsing \n");
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
                     queueCommands(command, session);

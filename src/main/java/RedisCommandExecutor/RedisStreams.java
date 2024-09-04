@@ -4,6 +4,9 @@ import RedisServer.KeyValue;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class RedisStreams {
     private final String streamKey;
@@ -11,16 +14,18 @@ public class RedisStreams {
     private long lastTimestamp;
     private long sequenceNumber;
     private String lastStreamId = "";
+    protected static final Lock lock = new ReentrantLock();
+    protected static final Condition newEntryCondition = lock.newCondition();
 
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
-        this.streamEntries = Collections.synchronizedMap(new LinkedHashMap<>());
+        this.streamEntries = new LinkedHashMap<>();
         this.lastTimestamp = 0;
         this.sequenceNumber = 0;
     }
 
-    public String addEntryToStreamID(String id, KeyValue entry, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
-        //writeSemaphore.acquire();
+    public String addEntryToStreamID(String id, KeyValue entry) throws InterruptedException {
+        lock.lock();
         try {
             if (id.equals("*")) {
                 id = autoGenerateId();
@@ -30,11 +35,12 @@ public class RedisStreams {
             System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
             streamEntries.put(id, entry);
             lastStreamId = id;
+            newEntryCondition.signalAll();
 
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-           // writeSemaphore.release();
+            lock.unlock();
         }
         return id;
     }
@@ -126,8 +132,7 @@ public class RedisStreams {
         return list;
     }
 
-    public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom, Semaphore writeSemaphore, Semaphore readSemaphore) throws InterruptedException {
-        //readSemaphore.acquire();
+    public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom) throws InterruptedException {
         Map<String, KeyValue> list = new LinkedHashMap<>();
         System.out.printf("In XREAD READING DATA ********** \n");
         try {
@@ -147,9 +152,14 @@ public class RedisStreams {
                     list.put(entry.getKey(), entry.getValue());
                 }
             }
-        } finally {
-          //  readSemaphore.release();
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return list;
     }
+    public boolean checkIfValueIsAddedToMainStreams(String streamKey){
+        return streamEntries.containsKey(streamKey);
+
+    }
+
 }
