@@ -88,7 +88,7 @@ public class XReadCommand implements IRedisCommandHandler{
 //            RedisStreams.lock.unlock();
 //        }
         while (System.currentTimeMillis() < endTime) {
-            RedisStreams.lock.readLock().lock();
+            RedisStreams.lock.writeLock().lock(); // Use writeLock instead of readLock
             try {
                 responseMap = processStreams(args, startIndex, streamCount, 0, null);
                 if (!responseMap.isEmpty()) {
@@ -103,7 +103,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 Thread.currentThread().interrupt();
                 throw new IOException("Thread interrupted during BLOCK wait", e);
             } finally {
-                RedisStreams.lock.readLock().unlock();
+                RedisStreams.lock.writeLock().unlock(); // Release the write lock
             }
         }
 
@@ -112,7 +112,6 @@ public class XReadCommand implements IRedisCommandHandler{
         } else {
             sendArrayRESPresponseForXRead(outputStream, responseMap);
         }
-
     }
 
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount,int k, OutputStream outputStream) throws IOException {
