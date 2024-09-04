@@ -18,6 +18,7 @@ public class Main {
     private static RedisProtocolParser redisProtocolParser;
     public static HashMap<String, KeyValue> storeKeyValue;
     public static Map<String, RedisStreams> streams;
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
 
     public static void main(String[] args) {
@@ -112,7 +113,7 @@ public class Main {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                    break;
                 }
-            }
+           }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
