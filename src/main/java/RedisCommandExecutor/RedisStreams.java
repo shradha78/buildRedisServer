@@ -7,6 +7,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RedisStreams {
     private final String streamKey;
@@ -14,8 +15,9 @@ public class RedisStreams {
     private long lastTimestamp;
     private long sequenceNumber;
     private String lastStreamId = "";
-    protected static final Lock lock = new ReentrantLock();
-    protected static final Condition newEntryCondition = lock.newCondition();
+
+    protected static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    protected static final Condition notEmpty = lock.writeLock().newCondition();
 
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
@@ -25,7 +27,7 @@ public class RedisStreams {
     }
 
     public String addEntryToStreamID(String id, KeyValue entry) throws InterruptedException {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             if (id.equals("*")) {
                 id = autoGenerateId();
@@ -35,12 +37,12 @@ public class RedisStreams {
             System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
             streamEntries.put(id, entry);
             lastStreamId = id;
-            newEntryCondition.signalAll();
+            notEmpty.signalAll();
 
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            lock.unlock();
+        } finally {
+            lock.writeLock().unlock();
         }
         return id;
     }
@@ -134,6 +136,7 @@ public class RedisStreams {
 
     public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom) throws InterruptedException {
         Map<String, KeyValue> list = new LinkedHashMap<>();
+        lock.readLock().lock();
         System.out.printf("In XREAD READING DATA ********** \n");
         try {
 
@@ -154,6 +157,8 @@ public class RedisStreams {
             }
         }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            lock.readLock().unlock();
         }
         return list;
     }
