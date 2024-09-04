@@ -21,13 +21,17 @@ public class EchoCommand implements IRedisCommandHandler{
     }
 
     public static void sendBulkStringResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
+        System.out.printf("In SENDING BULK STRING RESPONSE: "+ value +"\n");
         if(value.equals("")){
+            System.out.printf("In Sending NULL RESPONSE: \n");
             String responseBulkNullString = "$-1\r\n";
             outputStream.write(responseBulkNullString.getBytes());
+            outputStream.flush();
             return;
         }
         String responseBulkString = "$" + value.length() + "\r\n" + value + "\r\n";
         System.out.println(debugPrintStatement + responseBulkString + "\n");
         outputStream.write(responseBulkString.getBytes());
+        outputStream.flush();
     }
 }

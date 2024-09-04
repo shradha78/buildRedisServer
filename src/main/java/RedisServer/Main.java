@@ -92,7 +92,7 @@ public class Main {
             OutputStream outputStream = clientSocket.getOutputStream();
             PrintWriter printWriter = new PrintWriter(outputStream, true);
 //            OutputStream outputStream = null;
-            while (true) {
+           while (true) {
                 try {
                     System.out.println("Sending commands for parsing \n");
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);

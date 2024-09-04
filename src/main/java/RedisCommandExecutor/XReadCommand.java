@@ -13,7 +13,7 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.XRangeCommand.*;
 
 public class XReadCommand implements IRedisCommandHandler{
-    private static final long POLL_INTERVAL_MS = 100;
+    private static final long POLL_INTERVAL_MS = 1000;
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         int startIndex = 1;
@@ -72,8 +72,9 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 }
                 if (timeout) {
-                    System.out.println("Timeout");
-                    sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+                    System.out.println("Timeoutttttttt");
+                    System.out.println(outputStream.getClass());
+                    EchoCommand.sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
                     return;
                 } else {
                     sendArrayRESPresponseForXRead(outputStream, responseMap);
