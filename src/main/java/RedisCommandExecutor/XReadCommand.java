@@ -93,7 +93,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 System.out.println("Checking if being processed here \n");
                 key = args.get(i + k);
                 id = args.get(i + k + streamCount);
-                System.out.println("key = %s , id = %s \n",key,id);
+                System.out.printf("key = %s , id = %s \n",key,id);
 
                 long rangeFrom = parseIdToRange(id);
 
