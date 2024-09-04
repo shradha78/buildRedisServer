@@ -12,12 +12,12 @@ import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 public class GETCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        System.out.printf("In class GETCommand \n");
+        System.out.println("In class GETCommand \n");
         if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream,session)){
             return;
         }
         String key = args.get(0);
-        System.out.printf("Key here is : " + key);
+        System.out.println("Key here is : " + key);
         RedisServer.KeyValue keyValue = RedisServer.Main.storeKeyValue.get(key);
         if (keyValue == null || keyValue.isExpired()) {
             RedisServer.Main.storeKeyValue.remove(key);

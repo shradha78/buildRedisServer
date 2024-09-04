@@ -57,7 +57,7 @@ public class ExecCommand implements IRedisCommandHandler {
 
     private static void sendEmptyArrayResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
         String responseArray = "*" + value + "\r\n";
-        System.out.printf(debugPrintStatement + responseArray + "\n");
+        System.out.println(debugPrintStatement + responseArray + "\n");
         outputStream.write(responseArray.getBytes());
     }
 }

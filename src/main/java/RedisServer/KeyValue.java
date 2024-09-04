@@ -22,7 +22,7 @@ public class KeyValue {
     }
 
     public boolean isExpired() {
-        System.out.printf("Current Times is " + System.currentTimeMillis() + "\n");
+        System.out.println("Current Times is " + System.currentTimeMillis() + "\n");
         return expiryTime > 0 && System.currentTimeMillis() > expiryTime;
     }
 }

@@ -92,7 +92,7 @@
 //                //Socket finalClientSocket = clientSocket;
 //                new Thread(() -> {
 //                    try {
-//                        System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
+//                        System.out.println("Connected with Client : " + finalClientSocket.getPort() + "\n");
 //                        ClientSession session = new ClientSession();
 ////                        handlingClientCommands(finalClientSocket, session);
 //                        handlingClientCommands(finalClientSocket, session);
@@ -150,7 +150,7 @@
 //
 //    public static void processCommand(RedisCommand command, OutputStream outputStream, ClientSession session) throws IOException {
 //        IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
-//        System.out.printf("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
+//        System.out.println("Checking value for redis command handler " + redisCommandHandler.getClass().getName() + "\n");
 //        if (redisCommandHandler != null) {
 //            redisCommandHandler.execute(command.getListOfActions(), outputStream, session);
 //        } else {

@@ -10,7 +10,7 @@ import java.util.List;
 public class IncrCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        System.out.printf("In Incr class \n");
+        System.out.println("In Incr class \n");
         if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream,session)){
             return;
         }
@@ -36,7 +36,7 @@ public class IncrCommand implements IRedisCommandHandler{
 
     private static void sendIntegerResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {
         String responseInteger = ":" + value + "\r\n";
-        System.out.printf(debugPrintStatement + responseInteger + "\n");
+        System.out.println(debugPrintStatement + responseInteger + "\n");
         outputStream.write(responseInteger.getBytes());
     }
 }

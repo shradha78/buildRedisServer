@@ -27,7 +27,7 @@ public class EchoCommand implements IRedisCommandHandler{
             return;
         }
         String responseBulkString = "$" + value.length() + "\r\n" + value + "\r\n";
-        System.out.printf(debugPrintStatement + responseBulkString + "\n");
+        System.out.println(debugPrintStatement + responseBulkString + "\n");
         outputStream.write(responseBulkString.getBytes());
     }
 }

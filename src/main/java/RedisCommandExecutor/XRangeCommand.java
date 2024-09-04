@@ -46,7 +46,7 @@ public class XRangeCommand implements IRedisCommandHandler{
 
     public static void sendArrayRESPresponse(OutputStream outputStream, Map<String, KeyValue> list) throws IOException {
         StringBuilder sb = new StringBuilder();
-        System.out.printf("WRITING RESPONSE");
+        System.out.println("WRITING RESPONSE");
 
         // Start with the array header indicating the number of key-value pairs.
         // Each entry in the map represents a sub-array with 2 elements: key and an array of field-value pairs.

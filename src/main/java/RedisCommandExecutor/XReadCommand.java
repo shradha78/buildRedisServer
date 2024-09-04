@@ -45,100 +45,68 @@ public class XReadCommand implements IRedisCommandHandler{
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
-        System.out.printf("XREAD blocking start time: %d, will timeout at: %d\n", startTime, endTime);
-
-        //    Map<String, Map<String, KeyValue>> responseMap = processStreams(args, startIndex, streamCount, null);
+        System.out.println("XREAD blocking start time: %d, will timeout at: \n" + startTime + " " + endTime + "\n");
         Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
         boolean timeout = true;
 
-//        System.out.println("OUTSIDE WHILE LOOP");
-//        try {
-//            RedisStreams.lock.readLock().lock();
-//            System.out.println("OUTSIDE WHILE LOOP");
-//            while (System.currentTimeMillis() < endTime) {
-//                    System.out.println("BEFORE process streams.......");
-//                    responseMap = processStreams(args, startIndex, streamCount, 3,null);
-//                    long currentTime = System.currentTimeMillis();
-//                    System.out.printf("XREAD polling at: %d\n", currentTime);
-//
-//                    if (responseMap != null && !responseMap.isEmpty()) {
-//                        timeout = false;
-//                        System.out.printf("XREAD found data at: %d\n", currentTime);
-//                        System.out.printf("XREAD found data at: "+ currentTime +"\n");
-//                        break;
-//                    }
-//                    try {
-//                        System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis());
-//                        Thread.sleep(POLL_INTERVAL_MS);
-//                    } catch (InterruptedException e) {
-//                        Thread.currentThread().interrupt();
-//                        throw new IOException("Thread interrupted during BLOCK wait", e);
-//                    }
-//
-//                }
-//                if (timeout) {
-//                    System.out.printf("Timeout");
-//                    sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
-//                    return;
-//                } else {
-//                    sendArrayRESPresponseForXRead(outputStream, responseMap);
-//                    return;
-//                }
-//        }finally {
-//            RedisStreams.lock.unlock();
-//        }
-        while (System.currentTimeMillis() < endTime) {
-            RedisStreams.lock.writeLock().lock(); // Use writeLock instead of readLock
-            try {
-                responseMap = processStreams(args, startIndex, streamCount, 0, null);
-                if (!responseMap.isEmpty()) {
-                    timeout = false;
-                    break;
-                }
-                long timeRemaining = endTime - System.currentTimeMillis();
-                if (timeRemaining > 0) {
-                    RedisStreams.notEmpty.await(Math.min(timeRemaining, POLL_INTERVAL_MS), TimeUnit.MILLISECONDS);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Thread interrupted during BLOCK wait", e);
-            } finally {
-                RedisStreams.lock.writeLock().unlock(); // Release the write lock
-            }
-        }
+        System.out.println("OUTSIDE WHILE LOOP");
+            while (System.currentTimeMillis() < endTime) {
+                    System.out.println("BEFORE process streams.......");
+                    responseMap = processStreams(args, startIndex, streamCount, 3,null);
+                    long currentTime = System.currentTimeMillis();
+                System.out.println("XREAD polling at: %d\n"+ currentTime);
 
-        if (timeout) {
-            sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
-        } else {
-            sendArrayRESPresponseForXRead(outputStream, responseMap);
-        }
+                    if (responseMap != null && !responseMap.isEmpty()) {
+                        timeout = false;
+                        System.out.println("XREAD found data at: "+ currentTime + "\n");
+                        System.out.println("XREAD found data at: "+ currentTime +"\n");
+                        break;
+                    }
+                    try {
+                        System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis() + "\n");
+                        Thread.sleep(POLL_INTERVAL_MS);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Thread interrupted during BLOCK wait", e);
+                    }
+
+                }
+                if (timeout) {
+                    System.out.println("Timeout");
+                    sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+                    return;
+                } else {
+                    sendArrayRESPresponseForXRead(outputStream, responseMap);
+                    return;
+                }
+
     }
 
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount,int k, OutputStream outputStream) throws IOException {
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
-        System.out.printf("In Process Streams \n");
+        System.out.println("In Process Streams \n");
 //
         int currentIndex = startIndex;
         String key = "";
         String id = "";
             for (int i = startIndex; i <= streamCount; i++) {
-                System.out.printf("Checking if being processed here \n");
+                System.out.println("Checking if being processed here \n");
                 key = args.get(i + k);
                 id = args.get(i + k + streamCount);
-                System.out.printf("key = %s , id = %s \n",key,id);
+                System.out.println("key = %s , id = %s \n",key,id);
 
                 long rangeFrom = parseIdToRange(id);
 
                 RedisStreams streamKey = Main.streams.get(key);
                 if (streamKey != null) {
-                    System.out.printf("There's value for this key in stream \n");
+                    System.out.println("There's value for this key in stream \n");
                     Map<String, KeyValue> values = null;
                     try {
                         values = streamKey.getListOfAllValuesForXReadStream(rangeFrom);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    responseMap.put(key, values);
+                    if(!values.isEmpty())responseMap.put(key, values);
                 }
 
             }
@@ -146,7 +114,7 @@ public class XReadCommand implements IRedisCommandHandler{
             if (outputStream != null) {
                 sendArrayRESPresponseForXRead(outputStream, responseMap);
             }
-        System.out.printf("Does response map has values ? " + (responseMap.isEmpty()?"No" : "Yes" )+ "\n");
+        System.out.println("Does response map has values ? " + (responseMap.isEmpty()?"No" : "Yes" )+ "\n");
 
         return responseMap;
     }
@@ -179,7 +147,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 String id = entry.getKey(); // Assuming the key is used as the ID
                 String field = entry.getValue().getKey(); // Field should be the actual key
                 String value = entry.getValue().getValue();
-                System.out.printf("In Writing response --> id = %s , field = %s, value =%s\n",id,field,value);
+                System.out.println("In Writing response --> id = " + id  +" field = " + field + "value = " + value + "\n");
 
                 sb.append("*2").append("\r\n");
 
@@ -195,7 +163,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 sb.append(value).append("\r\n");
             }
         }
-        System.out.printf("OUTPUT --> " + sb.toString());
+        System.out.println("OUTPUT --> " + sb.toString());
         // Write the entire response to the output stream
         outputStream.write(sb.toString().getBytes());
     }

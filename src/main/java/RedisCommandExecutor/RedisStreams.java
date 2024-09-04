@@ -16,8 +16,6 @@ public class RedisStreams {
     private long sequenceNumber;
     private String lastStreamId = "";
 
-    protected static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    protected static final Condition notEmpty = lock.writeLock().newCondition();
 
     public RedisStreams(String streamKey) {
         this.streamKey = streamKey;
@@ -27,7 +25,6 @@ public class RedisStreams {
     }
 
     public String addEntryToStreamID(String id, KeyValue entry) throws InterruptedException {
-        lock.writeLock().lock();
         try {
             if (id.equals("*")) {
                 id = autoGenerateId();
@@ -37,12 +34,10 @@ public class RedisStreams {
             System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
             streamEntries.put(id, entry);
             lastStreamId = id;
-            notEmpty.signalAll();
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            lock.writeLock().unlock();
         }
         return id;
     }
@@ -62,11 +57,11 @@ public class RedisStreams {
         System.out.printf("##### IN Auto generate SEQ: lastTimestamp=%d, idTimestamp=%d\n", lastTimestamp, idTimestamp);
 
         if (idTimestamp == lastTimestamp) {
-            System.out.printf("If equal to last entry******** \n");
+            System.out.println("If equal to last entry******** \n");
             return ++sequenceNumber;
         }
         if (idTimestamp == 0) {
-            System.out.printf("If equal to 0 " + idTimestamp + "\n");
+            System.out.println("If equal to 0 " + idTimestamp + "\n");
             return 1;
         }
 
@@ -76,7 +71,6 @@ public class RedisStreams {
 
     private String autoGenerateId() {
         long currentTimestamp = System.currentTimeMillis();
-        System.out.printf("^^^^^^ Auto generating ID here: lastTimestamp=%d, currentTimestamp=%d\n", lastTimestamp, currentTimestamp);
 
         if (currentTimestamp == lastTimestamp) {
             // Increment sequence number if timestamp is the same
@@ -93,7 +87,7 @@ public class RedisStreams {
         long idTimestamp = Long.parseLong(idSplit[0]);
         long idSequenceNum = idSplit[1].equals("*") ? 10000000 : Long.parseLong(idSplit[1]);
         if(idSequenceNum == 10000000 ) return Constants.VALID;
-        System.out.printf("********* Stream Id : "+ idTimestamp + " " + idSequenceNum + "\n");
+        System.out.println("********* Stream Id : "+ idTimestamp + " " + idSequenceNum + "\n");
         if (idTimestamp == 0 && idSequenceNum == 0) {
             return Constants.GREATER_THAN_ZERO;
         }
@@ -136,16 +130,15 @@ public class RedisStreams {
 
     public  Map<String,KeyValue> getListOfAllValuesForXReadStream(long idFrom) throws InterruptedException {
         Map<String, KeyValue> list = new LinkedHashMap<>();
-        lock.readLock().lock();
-        System.out.printf("In XREAD READING DATA ********** \n");
+        System.out.println("In XREAD READING DATA ********** \n");
         try {
 
             for (Map.Entry<String, KeyValue> entry : streamEntries.entrySet()) {
                 String[] idSplit = entry.getKey().split("-");
                 long id = Long.parseLong(idSplit[0]) + Long.parseLong(idSplit[1]);
-                //System.out.printf("Reading id =%l \n",id );
+                //System.out.println("Reading id =%l \n",id );
                 boolean withinRange = (id > idFrom);
-                System.out.printf("Value for withinRange = " +withinRange + "\n");
+                System.out.println("Value for withinRange = " +withinRange + "\n");
 
                 if (withinRange) {
                     System.out.printf("****** IN XREAD Getting list : %s____%s------%s%n",
@@ -158,7 +151,7 @@ public class RedisStreams {
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-            lock.readLock().unlock();
+
         }
         return list;
     }

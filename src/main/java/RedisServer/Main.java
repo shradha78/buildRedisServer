@@ -62,7 +62,7 @@ public class Main {
                 //Socket finalClientSocket = clientSocket;
                 new Thread(() -> {
                     try {
-                        System.out.printf("Connected with Client : " + finalClientSocket.getPort() + "\n");
+                        System.out.println("Connected with Client : " + finalClientSocket.getPort() + "\n");
                         ClientSession session = new ClientSession();
 //                        handlingClientCommands(finalClientSocket, session);
                         handlingClientCommands(finalClientSocket, session);
@@ -94,7 +94,7 @@ public class Main {
 //            OutputStream outputStream = null;
             while (true) {
                 try {
-                    System.out.printf("Sending commands for parsing \n");
+                    System.out.println("Sending commands for parsing \n");
                     List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
                     queueCommands(command, session);

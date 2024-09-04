@@ -13,6 +13,6 @@ public class PingCommand implements IRedisCommandHandler{
             return;
         }
         outputStream.write("+PONG\r\n".getBytes());
-        System.out.printf("Received PONG from client! \n");
+        System.out.println("Received PONG from client! \n");
     }
 }
