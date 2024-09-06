@@ -16,7 +16,8 @@ public class RedisProtocolParser {
 
         if(line == null || !line.startsWith("*") || line.isEmpty()){
             System.out.println("******* In null Line read ");
-            throw new IOException("Invalid RESP message");
+            //throw new IOException("Invalid RESP message");
+            return new ArrayList<>();
         }
 //        System.out.println("Client's command :: " + line);
 //        int numberOfArguments = Integer.parseInt(line.substring(1,2));//for debug through local
