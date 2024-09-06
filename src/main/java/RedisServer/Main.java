@@ -119,6 +119,7 @@ public class Main {
         System.out.printf("Checking value for redis command handler %s\n", redisCommandHandler != null ? redisCommandHandler.getClass().getName() : "null");
 
         if (redisCommandHandler != null) {
+            System.out.println("***** Control is here, processing command");
             redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
