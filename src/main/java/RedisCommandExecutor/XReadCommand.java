@@ -48,47 +48,36 @@ public class XReadCommand implements IRedisCommandHandler{
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream, ClientSession session) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
+        String streamKey = args.get(startIndex);  // Assuming single stream for simplicity
+        RedisStreams stream = Main.streams.get(streamKey);
         Map<String, Map<String, KeyValue>> responseMap = null;
-        boolean dataAdded = false;  // Flag to track if data was added during XREAD block
 
-        while (System.currentTimeMillis() < endTime) {
-            try {
-                // Poll the command queue with a timeout
-                RedisCommand command = commandQueue.poll(1000, TimeUnit.MILLISECONDS); // Sleep for 1 second intervals
+        synchronized (stream) {
+            while (System.currentTimeMillis() < endTime) {
+                // Check for new data in the streams
+                responseMap = processStreams(args, startIndex, streamCount, 0, null);
 
-                if (command != null) {
-                    // Process the command if it's available
-                    processCommand(command, outputStream, session);
-
-                    // If the command is XADD and modifies the stream, mark data as added
-                    if (command.getCommand().equalsIgnoreCase("XADD")) {
-                        dataAdded = true;
-                    }
-
-                    // Break the loop if new data was added during the block
-                    if (dataAdded) {
-                        break;
-                    }
-                } else {
-                    // Only send PING if no data is added and no command is available
-                    handlePing(outputStream);
+                if (responseMap != null && !responseMap.isEmpty()) {
+                    // New data found, send the response
+                    sendArrayRESPresponseForXRead(outputStream, responseMap);
+                    return;  // Exit after sending data
                 }
 
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Thread interrupted during BLOCK wait", e);
+                try {
+                    // Wait for new data or until timeout
+                    long timeRemaining = endTime - System.currentTimeMillis();
+                    if (timeRemaining > 0) {
+                        stream.wait(timeRemaining);  // Wait until new data is added or timeout
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Thread interrupted during BLOCK wait", e);
+                }
             }
         }
 
-        // Process the stream and send response if data was added or if timeout occurs
-        responseMap = processStreams(args, startIndex, streamCount, 3, null);
-        commandQueue.clear();  // Clear the command queue after processing
-
-        if (responseMap != null && !responseMap.isEmpty()) {
-            sendArrayRESPresponseForXRead(outputStream, responseMap);  // Send stream data
-        } else {
-            sendBulkStringResponse(outputStream, "", "There's a timeout");  // Send timeout message
-        }
+        // If no new data was added within the block timeout, return null response
+        sendBulkStringResponse(outputStream,"","There's a timeout or no value");
     }
 
     private Map<String, Map<String, KeyValue>> processStreams(List<String> args, int startIndex, int streamCount,int k, OutputStream outputStream) throws IOException {

@@ -90,8 +90,8 @@ public class Main {
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
                     queueCommands(command, session);
                     processCommand(command,outputStream,session);//based on commands, it will process output
-                    commandQueue.add(command);  // Add command to queue
-                    handleCommandQueue(outputStream, session);  // Handle the queue in the same main thread
+//                    commandQueue.add(command);  // Add command to queue
+//                    handleCommandQueue(outputStream, session);  // Handle the queue in the same main thread
                 } catch (IOException e) {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                    break;
