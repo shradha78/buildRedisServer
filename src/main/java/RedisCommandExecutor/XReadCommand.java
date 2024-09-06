@@ -47,40 +47,49 @@ public class XReadCommand implements IRedisCommandHandler{
         long endTime = startTime + blockTimeout;
         System.out.println("XREAD blocking start time: %d, will timeout at: \n" + startTime + " " + endTime + "\n");
         Map<String, Map<String, KeyValue>> responseMap = null;
-        boolean timeout = true;
+        //boolean timeout = true;
+        boolean timeout = false;
 
-        System.out.println("OUTSIDE WHILE LOOP");
-        while (startTime < endTime) {
-
-            System.out.println("BEFORE process streams.......");
+//        System.out.println("OUTSIDE WHILE LOOP");
+//        while (startTime < endTime) {
+//
+//            System.out.println("BEFORE process streams.......");
+//            responseMap = processStreams(args, startIndex, streamCount, 3,null);
+//            long currentTime = System.currentTimeMillis();
+//            System.out.printf("XREAD polling at: %d\n", currentTime);
+//
+//            if (responseMap != null && !responseMap.isEmpty()) {
+//                timeout = false;
+//                System.out.printf("XREAD found data at: "+ currentTime +"\n");
+//                break;
+//            }
+//            try {
+//                System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis());
+//                Thread.sleep(POLL_INTERVAL_MS);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//                throw new IOException("Thread interrupted during BLOCK wait", e);
+//            }
+//
+//            startTime = System.currentTimeMillis();
+//        }
+        try {
+            System.out.println("Making XREAD Thread sleep for block duration..... ");
+            Thread.sleep(blockTimeout);
             responseMap = processStreams(args, startIndex, streamCount, 3,null);
-            long currentTime = System.currentTimeMillis();
-            System.out.printf("XREAD polling at: %d\n", currentTime);
-
-            if (responseMap != null && !responseMap.isEmpty()) {
-                timeout = false;
-                System.out.printf("XREAD found data at: "+ currentTime +"\n");
-                break;
+            if(responseMap == null || responseMap.isEmpty()){
+                timeout = true;
             }
-            try {
-                System.out.println("SLEEPING FOR ::: " + System.currentTimeMillis());
-                Thread.sleep(POLL_INTERVAL_MS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Thread interrupted during BLOCK wait", e);
-            }
-
-            startTime = System.currentTimeMillis();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-                if (timeout) {
-                    System.out.println("Timeoutttttttt");
-                    System.out.println(outputStream.getClass());
-                    EchoCommand.sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
-                    return;
-                } else {
-                    sendArrayRESPresponseForXRead(outputStream, responseMap);
-                    return;
-                }
+        if (timeout) {
+            System.out.println("Timeoutttttttt");
+            System.out.println(outputStream.getClass());
+            EchoCommand.sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+        } else {
+            sendArrayRESPresponseForXRead(outputStream, responseMap);
+        }
 
     }
 
