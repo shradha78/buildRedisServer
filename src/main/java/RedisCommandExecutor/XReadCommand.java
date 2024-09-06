@@ -3,6 +3,7 @@ package RedisCommandExecutor;
 import RedisServer.ClientSession;
 import RedisServer.KeyValue;
 import RedisServer.Main;
+import RedisServer.RedisCommand;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
 import static RedisCommandExecutor.XRangeCommand.*;
+import static RedisServer.Main.commandQueue;
+import static RedisServer.Main.processCommand;
 
 public class XReadCommand implements IRedisCommandHandler{
     private static final long POLL_INTERVAL_MS = 100;
@@ -34,7 +37,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
         if (isBlocked) {
             // Handle blocking with timeout
-            handleBlockingXRead(args, startIndex, streamCountPairs, blockTimeout, outputStream);
+            handleBlockingXRead(args, startIndex, streamCountPairs, blockTimeout, outputStream, session);
         } else {
             // Handle non-blocking XREAD
             Map<String, Map<String, KeyValue>> responseMap =  processStreams(args, startIndex, streamCount, 0,outputStream);
@@ -42,13 +45,13 @@ public class XReadCommand implements IRedisCommandHandler{
         }
     }
 
-    private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream) throws IOException {
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + blockTimeout;
-        System.out.println("XREAD blocking start time: %d, will timeout at: \n" + startTime + " " + endTime + "\n");
-        Map<String, Map<String, KeyValue>> responseMap = null;
-        //boolean timeout = true;
-        boolean timeout = false;
+    private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream, ClientSession session) throws IOException {
+//        long startTime = System.currentTimeMillis();
+//        long endTime = startTime + blockTimeout;
+//        System.out.println("XREAD blocking start time: %d, will timeout at: \n" + startTime + " " + endTime + "\n");
+//        Map<String, Map<String, KeyValue>> responseMap = null;
+//        //boolean timeout = true;
+//        boolean timeout = false;
 
 //        System.out.println("OUTSIDE WHILE LOOP");
 //        while (startTime < endTime) {
@@ -73,22 +76,40 @@ public class XReadCommand implements IRedisCommandHandler{
 //
 //            startTime = System.currentTimeMillis();
 //        }
-        try {
-            System.out.println("Making XREAD Thread sleep for block duration..... ");
-            Thread.sleep(blockTimeout);
-            responseMap = processStreams(args, startIndex, streamCount, 3,null);
-            if(responseMap == null || responseMap.isEmpty()){
-                timeout = true;
+//        if (timeout) {
+//            System.out.println("Timeoutttttttt");
+//            System.out.println(outputStream.getClass());
+//            EchoCommand.sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
+//        } else {
+//            sendArrayRESPresponseForXRead(outputStream, responseMap);
+//       }
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + blockTimeout;
+        Map<String, Map<String, KeyValue>> responseMap = null;
+        while (System.currentTimeMillis() < endTime) {
+            try {
+                // Poll the command queue with a timeout
+                RedisCommand command = commandQueue.poll(1000, TimeUnit.MILLISECONDS); // Sleep for 1 second intervals
+
+                if (command != null) {
+                    // Process the command if it's available
+                    processCommand(command, outputStream,session);
+                } else {
+                    // No command, so send a PING response to keep the connection alive
+                    handlePing(outputStream);
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Thread interrupted during BLOCK wait", e);
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
-        if (timeout) {
-            System.out.println("Timeoutttttttt");
-            System.out.println(outputStream.getClass());
-            EchoCommand.sendBulkStringResponse(outputStream, "", "There's a timeout and no value received");
-        } else {
+        responseMap = processStreams(args, startIndex, streamCount, 3,null);
+        commandQueue.clear();
+        if(responseMap != null) {
             sendArrayRESPresponseForXRead(outputStream, responseMap);
+        }else{
+            sendBulkStringResponse(outputStream,"","There's a timeout");
         }
 
     }
@@ -179,8 +200,9 @@ public class XReadCommand implements IRedisCommandHandler{
         outputStream.write(sb.toString().getBytes());
     }
 
-    public boolean isBlockingCommand(){
-        return false;
+    private void handlePing(OutputStream outputStream) throws IOException {
+        System.out.println("Handling PING command");
+        outputStream.write("+PONG\r\n".getBytes());
     }
 
 }

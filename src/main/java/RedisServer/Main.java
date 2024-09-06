@@ -19,7 +19,8 @@ public class Main {
     public static HashMap<String, KeyValue> storeKeyValue;
     public static Map<String, RedisStreams> streams;
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
-
+    private static final String DEFAULT_RESULT = "+PONG\r\n";
+    public static final BlockingQueue<RedisCommand> commandQueue = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -29,17 +30,6 @@ public class Main {
         int port = 6379;
 
        listenToPort(clientSocket, port);
-
-//        //Debug
-//        redisCommandParser = new RedisCommandParser();
-//        redisProtocolParser = new RedisProtocolParser();
-//        storeKeyValue = new HashMap<>();
-//        streams = new HashMap<>();
-//        try {
-//            handlingClientCommands(null, null);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
     }
 
@@ -100,15 +90,8 @@ public class Main {
                     RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
                     queueCommands(command, session);
                     processCommand(command,outputStream,session);//based on commands, it will process output
-                    //Debug
-//                    RedisCommand command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-1", "temperature", "36")));
-//                    processCommand(command, outputStream, session);//based on commands, it will process output
-////                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("BLOCK", "1000", "streams", "shradha", "0-1")));
-////                    processCommand(command, outputStream, session);//based on commands, it will process output
-//                    command = new RedisCommand("XADD", new ArrayList<>(Arrays.asList("shradha", "0-2", "temperature", "40")));
-//                    processCommand(command, outputStream, session);//based on commands, it will process output
-//                    command = new RedisCommand("XREAD", new ArrayList<>(Arrays.asList("streams", "shradha", "0-1")));
-//                    processCommand(command, outputStream, session);//br
+                    commandQueue.add(command);  // Add command to queue
+                    handleCommandQueue(outputStream, session);  // Handle the queue in the same main thread
                 } catch (IOException e) {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
                    break;
@@ -141,6 +124,15 @@ public class Main {
         }
         queueOfCommandsForMultiAndExec.add(command);
         System.out.printf("Queued command: %s\n", command.getCommand());
+    }
+    private static void handleCommandQueue(OutputStream outputStream, ClientSession session) throws IOException {
+        // Poll for the next command and process it
+        while (!commandQueue.isEmpty()) {
+            RedisCommand nextCommand = commandQueue.poll();  // Remove command from the queue
+            if (nextCommand != null) {
+                processCommand(nextCommand, outputStream, session);
+            }
+        }
     }
 
 }
