@@ -48,26 +48,23 @@ public class XReadCommand implements IRedisCommandHandler{
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream, ClientSession session) throws IOException {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + blockTimeout;
-        String streamKey = args.get(startIndex);  // Assuming single stream for simplicity
+        String streamKey = args.get(startIndex);
         RedisStreams stream = Main.streams.get(streamKey);
         Map<String, Map<String, KeyValue>> responseMap = null;
 
         synchronized (stream) {
             while (System.currentTimeMillis() < endTime) {
-                // Check for new data in the streams
+                System.out.println("XREAD is waiting for new data...");
                 responseMap = processStreams(args, startIndex, streamCount, 0, null);
-
                 if (responseMap != null && !responseMap.isEmpty()) {
-                    // New data found, send the response
+                    System.out.println("XREAD received new data.");
                     sendArrayRESPresponseForXRead(outputStream, responseMap);
-                    return;  // Exit after sending data
+                    return;
                 }
-
                 try {
-                    // Wait for new data or until timeout
                     long timeRemaining = endTime - System.currentTimeMillis();
                     if (timeRemaining > 0) {
-                        stream.wait(timeRemaining);  // Wait until new data is added or timeout
+                        stream.wait(timeRemaining);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -75,6 +72,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 }
             }
         }
+        System.out.println("XREAD timed out without receiving new data.");
 
         // If no new data was added within the block timeout, return null response
         sendBulkStringResponse(outputStream,"","There's a timeout or no value");
