@@ -68,7 +68,7 @@ public class XReadCommand implements IRedisCommandHandler{
         }
        // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
 
-        if(!timeout || !responseMap.isEmpty()){
+        if(!timeout && !responseMap.isEmpty()){
             sendArrayRESPresponseForXRead(outputStream, responseMap);
         }else{
             // If no new data was added within the block timeout, return null response
