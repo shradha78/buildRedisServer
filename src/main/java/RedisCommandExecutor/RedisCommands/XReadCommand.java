@@ -48,7 +48,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
         long endTime = startTime + blockTimeout;
 
-        Map<String, Map<String, KeyValue>> responseMap = null;
+        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
 
         boolean timeout = true;
 
@@ -62,7 +62,9 @@ public class XReadCommand implements IRedisCommandHandler{
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+
             responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
+
         }
        // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
 
