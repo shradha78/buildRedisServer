@@ -13,7 +13,9 @@ public class RedisProtocolParser {
         String line = br.readLine();
 
         System.out.println("******* Next Line ");
-        if(line == null || !line.startsWith("*")){
+
+        if(line == null || !line.startsWith("*") || line.isEmpty()){
+            System.out.println("******* In null Line read ");
             throw new IOException("Invalid RESP message");
         }
 //        System.out.println("Client's command :: " + line);
