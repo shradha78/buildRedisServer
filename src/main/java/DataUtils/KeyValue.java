@@ -1,4 +1,4 @@
-package RedisServer;
+package DataUtils;
 
 public class KeyValue {
     private  String key;

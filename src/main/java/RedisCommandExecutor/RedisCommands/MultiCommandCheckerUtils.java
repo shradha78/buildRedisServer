@@ -1,7 +1,6 @@
-package RedisCommandExecutor;
+package RedisCommandExecutor.RedisCommands;
 
 import RedisServer.ClientSession;
-import RedisServer.Main;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,6 +12,7 @@ public class MultiCommandCheckerUtils {
             sendQueuedAsResponse(outputStream, "QUEUED");
             return true;
         }
+
         return false;
     }
 

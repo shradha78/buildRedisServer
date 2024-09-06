@@ -1,4 +1,4 @@
-package RedisServer;
+package RedisCommandExecutor.RedisCommandsParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;

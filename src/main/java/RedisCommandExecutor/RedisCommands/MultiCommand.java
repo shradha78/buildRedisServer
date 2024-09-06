@@ -1,12 +1,11 @@
-package RedisCommandExecutor;
+package RedisCommandExecutor.RedisCommands;
 
 import RedisServer.ClientSession;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-
-import static RedisCommandExecutor.SETCommand.sendSimpleOKResponse;
+import static RedisResponses.ShortParsedResponses.sendSimpleOKResponse;
 
 public class MultiCommand implements IRedisCommandHandler{
 

@@ -1,4 +1,4 @@
-package RedisCommandExecutor;
+package DataUtils;
 
 public enum Constants {
     EQUAL_OR_SMALLER,

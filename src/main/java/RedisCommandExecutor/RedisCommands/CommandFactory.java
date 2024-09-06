@@ -1,4 +1,4 @@
-package RedisCommandExecutor;
+package RedisCommandExecutor.RedisCommands;
 
 import java.util.HashMap;
 import java.util.Map;

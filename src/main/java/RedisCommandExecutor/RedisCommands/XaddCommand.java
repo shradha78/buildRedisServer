@@ -1,16 +1,16 @@
-package RedisCommandExecutor;
+package RedisCommandExecutor.RedisCommands;
 
+import DataUtils.Constants;
 import RedisServer.ClientSession;
-import RedisServer.KeyValue;
-import RedisServer.Main;
+import DataUtils.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 
-import static RedisCommandExecutor.EchoCommand.sendBulkStringResponse;
-import static RedisCommandExecutor.IncrCommand.sendErrorResponse;
+import static RedisResponses.ShortParsedResponses.sendBulkStringResponse;
+import static RedisResponses.ShortParsedResponses.sendErrorResponse;
+
 
 public class XaddCommand implements IRedisCommandHandler{
 
@@ -20,7 +20,7 @@ public class XaddCommand implements IRedisCommandHandler{
         String streamKeyId = args.get(1);
         KeyValue newKeyValueToBeAdded = new KeyValue(args.get(2), args.get(3), 0);
 
-        RedisStreams redisStreams = Main.streams.computeIfAbsent(streamKey, RedisStreams::new);
+        RedisStreams redisStreams = DataUtils.StreamsData.getStreamData(streamKey);
         Constants validationResult = redisStreams.validateStreamId(streamKeyId);
 
         if (validationResult != Constants.VALID) {
