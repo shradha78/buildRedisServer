@@ -53,7 +53,7 @@ public class XReadCommand implements IRedisCommandHandler{
         boolean timeout = true;
 
         while (System.currentTimeMillis() < endTime) {
-            if (responseMap.isEmpty() || responseMap == null) {
+            if (responseMap != null || !responseMap.isEmpty()) {
                 timeout = false;
                 break;
             }
