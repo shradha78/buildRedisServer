@@ -30,8 +30,8 @@ public class XaddCommand implements IRedisCommandHandler{
         try {
             synchronized (redisStreams) {
 
-            streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
-            System.out.println("Is the key added to streams ? : "  + redisStreams.checkIfValueIsAddedToMainStreams(streamKeyId) + "\n");
+                streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
+                System.out.println("Is the key added to streams ? : "  + redisStreams.checkIfValueIsAddedToMainStreams(streamKeyId) + "\n");
                 redisStreams.notifyAll();
             }
 

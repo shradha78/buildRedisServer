@@ -54,13 +54,15 @@ public class XReadCommand implements IRedisCommandHandler{
 
         synchronized (stream) {
             while (System.currentTimeMillis() < endTime) {
-                System.out.println("XREAD is waiting for new data...");
+                System.out.println("XREAD checking for new data...");
                 responseMap = processStreams(args, startIndex, streamCount, 0, null);
+
                 if (responseMap != null && !responseMap.isEmpty()) {
-                    System.out.println("XREAD received new data.");
+                    System.out.println("XREAD received data.");
                     sendArrayRESPresponseForXRead(outputStream, responseMap);
                     return;
                 }
+
                 try {
                     long timeRemaining = endTime - System.currentTimeMillis();
                     if (timeRemaining > 0) {
@@ -72,7 +74,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 }
             }
         }
-        System.out.println("XREAD timed out without receiving new data.");
+        System.out.println("XREAD timed out without data.");
 
         // If no new data was added within the block timeout, return null response
         sendBulkStringResponse(outputStream,"","There's a timeout or no value");
