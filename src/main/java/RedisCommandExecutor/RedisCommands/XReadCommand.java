@@ -64,7 +64,7 @@ public class XReadCommand implements IRedisCommandHandler{
             }
             responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
         }
-        responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
+       // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
 
         if(!timeout){
             sendArrayRESPresponseForXRead(outputStream, responseMap);
