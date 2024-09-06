@@ -25,7 +25,10 @@ public class CommandFactory {
 
     public static IRedisCommandHandler getCommandFromAvailableCommands(String commandName) {
         System.out.println("In Command Factory, Command Received is :  " + commandName + "\n" );
-        System.out.println("Checking if we are getting a value " + commands.getOrDefault(commandName , new SETCommand()) + "\n");
+        System.out.println("Checking if we are getting a value " + commands.getOrDefault(commandName , new PingCommand()) + "\n");
+        if(commandName.equals("Unknown Command")){
+            commandName = "PING";
+        }
         if(!commands.containsKey(commandName.toUpperCase())){
             return null;
         }
