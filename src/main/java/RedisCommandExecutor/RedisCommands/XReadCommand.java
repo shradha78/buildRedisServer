@@ -48,7 +48,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
         long endTime = startTime + blockTimeout;
 
-        Map<String, Map<String, KeyValue>> responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
+        Map<String, Map<String, KeyValue>> responseMap = null;
 
         boolean timeout = true;
 
@@ -66,7 +66,7 @@ public class XReadCommand implements IRedisCommandHandler{
         }
        // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
 
-        if(!timeout){
+        if(!timeout || !responseMap.isEmpty()){
             sendArrayRESPresponseForXRead(outputStream, responseMap);
         }else{
             // If no new data was added within the block timeout, return null response
@@ -84,16 +84,22 @@ public class XReadCommand implements IRedisCommandHandler{
         String id = "";
             for (int i = startIndex; i <= streamCount; i++) {
                 System.out.println("Checking if being processed here \n");
+
                 key = args.get(i + k);
+
                 id = args.get(i + k + streamCount);
+
                 System.out.printf("key = %s , id = %s \n",key,id);
 
                 long rangeFrom = parseIdToRange(id);
 
                 RedisStreams streamKey = DataUtils.StreamsData.getStreamData(key);
                 if (streamKey != null) {
+
                     System.out.println("There's value for this key in stream \n");
+
                     Map<String, KeyValue> values = null;
+
                     try {
                         values = streamKey.getListOfStreamsDataForXread(rangeFrom);
                     } catch (InterruptedException e) {
