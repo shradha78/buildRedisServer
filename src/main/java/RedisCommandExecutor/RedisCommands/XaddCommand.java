@@ -7,6 +7,7 @@ import DataUtils.KeyValue;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import static RedisResponses.ShortParsedResponses.sendBulkStringResponse;
 import static RedisResponses.ShortParsedResponses.sendErrorResponse;
@@ -28,11 +29,20 @@ public class XaddCommand implements IRedisCommandHandler{
             return;
         }
         try {
-            synchronized (redisStreams) {
 
                 streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
                 System.out.println("Is the key added to streams ? : "  + redisStreams.checkIfValueIsAddedToMainStreams(streamKeyId) + "\n");
                 redisStreams.notifyAll();
+
+            synchronized (StreamThreadHandler.streamLatches) {
+                List<CountDownLatch> latches =
+                        StreamThreadHandler.streamLatches.get(streamKey);
+                if (latches != null) {
+                    for (CountDownLatch latch : latches) {
+                        latch.countDown();
+                    }
+                    StreamThreadHandler.streamLatches.remove(streamKey);
+                }
             }
 
         } catch (InterruptedException e) {

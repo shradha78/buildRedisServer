@@ -51,7 +51,7 @@ public class Main {
 
                 final Socket finalClientSocket = clientSocket;
 
-               // new Thread(() -> {
+                new Thread(() -> {
                     try {
 
                         System.out.println("Connected with Client : " + finalClientSocket.getPort() );
@@ -62,7 +62,7 @@ public class Main {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-            //    }).start();
+                }).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
