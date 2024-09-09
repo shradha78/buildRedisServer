@@ -176,4 +176,15 @@ public class RedisStreams {
         return lastStreamId;
     }
 
+    public static String getSecondLastStreamTimestamp(String streamKey) {
+        List<Map.Entry<String,KeyValue>> entryList = new ArrayList<>(StreamsData.streams.get(streamKey).streamsDataPerTimestamp.entrySet());
+
+        if (entryList.size() < 2) {
+            return null; // Not enough entries to get the second-to-last one
+        }
+
+        // Get the second-to-last entry
+        return entryList.get(entryList.size() - 2).getKey();
+    }
+
 }

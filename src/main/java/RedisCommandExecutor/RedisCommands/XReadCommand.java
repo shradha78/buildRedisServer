@@ -15,6 +15,7 @@ import static RedisResponses.ShortParsedResponses.sendBulkStringResponse;
 
 public class XReadCommand implements IRedisCommandHandler{
     private static final long POLL_INTERVAL_MS = 100;
+
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("#######XReadCommand");
@@ -118,9 +119,11 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 long rangeFrom = 0;
                 if(id.equals("$")){
-                    rangeFrom = parseIdToRange(RedisStreams.getLastStreamId());
+                    String lastStreamId = RedisStreams.getSecondLastStreamTimestamp(key);
+                    rangeFrom = parseIdToRange(lastStreamId);
                 }else{
                     rangeFrom = Long.parseLong(id);
+
                 }
 
                 RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForValidation(key);
@@ -155,6 +158,7 @@ public class XReadCommand implements IRedisCommandHandler{
         }
         return 0;
     }
+
 
 
 }
