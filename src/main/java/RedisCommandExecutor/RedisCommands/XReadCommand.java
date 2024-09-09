@@ -50,7 +50,7 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
 
         long endTime = startTime + blockTimeout;
-        Map<String, Map<String, KeyValue>> responseMap = null;
+        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
 
         boolean timeout = true;
 
@@ -89,7 +89,7 @@ public class XReadCommand implements IRedisCommandHandler{
     }
 
     private void blockWithoutTimeout(List<String> args, int startIndex, int streamCount, OutputStream outputStream, Map<String, Map<String, KeyValue>> responseMap) throws IOException {
-        while(responseMap == null && responseMap.isEmpty()){
+        while(responseMap == null || responseMap.isEmpty()){
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
