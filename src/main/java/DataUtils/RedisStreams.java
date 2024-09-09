@@ -172,4 +172,8 @@ public class RedisStreams {
         return streamsDataPerTimestamp.containsKey(streamKey);
     }
 
+    public static String getLastStreamId(){
+        return lastStreamId;
+    }
+
 }

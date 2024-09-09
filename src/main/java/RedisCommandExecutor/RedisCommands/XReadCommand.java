@@ -116,7 +116,12 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 System.out.printf("key = %s , id = %s \n",key,id);
 
-                long rangeFrom = parseIdToRange(id);
+                long rangeFrom = 0;
+                if(id.equals("$")){
+                    rangeFrom = parseIdToRange(RedisStreams.getLastStreamId());
+                }else{
+                    rangeFrom = Long.parseLong(id);
+                }
 
                 RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForValidation(key);
                 if (streamKey != null) {
