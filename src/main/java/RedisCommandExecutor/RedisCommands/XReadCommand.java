@@ -99,7 +99,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 long rangeFrom = parseIdToRange(id);
 
-                RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForProcessingXREAD(key);
+                RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForValidation(key);
                 if (streamKey != null) {
 
                     System.out.println("There's value for this key in stream \n");
