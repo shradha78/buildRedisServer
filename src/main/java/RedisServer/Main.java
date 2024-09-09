@@ -103,7 +103,12 @@ public class Main {
                     //maintaining queue of commands, specifically for MULTI and EXEC Command
                     queueCommands(command, session);
 
-                    processCommand(command,outputStream,session);//based on commands, it will process output
+                    try {
+                        processCommand(command, outputStream, session);//based on commands, it will process output
+                    } catch (IOException e) {
+                        System.out.println("Error while processing command: " + e.getMessage());
+                        break;
+                    }
 
                 } catch (IOException e) {
                     outputStream.write("-ERR invalid input\r\n".getBytes());
@@ -112,6 +117,7 @@ public class Main {
            }
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("IOException while handling client commands: " + e.getMessage());
         } finally {
             try {
                 if (clientSocket != null && !clientSocket.isClosed()) {

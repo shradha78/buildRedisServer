@@ -25,6 +25,7 @@ public class ShortParsedResponses {
 
     public static void sendErrorResponse(OutputStream outputStream, String message) throws IOException {
         outputStream.write(("-ERR " +  message + "\r\n").getBytes());
+        outputStream.flush();
     }
 
     public static void sendIntegerResponse(OutputStream outputStream, String value, String debugPrintStatement) throws IOException {

@@ -50,11 +50,20 @@ public class XReadCommand implements IRedisCommandHandler{
         long startTime = System.currentTimeMillis();
 
         long endTime = startTime + blockTimeout;
-
-        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
+        Map<String, Map<String, KeyValue>> responseMap = null;
 
         boolean timeout = true;
 
+        if(blockTimeout == 0) {
+            blockWithoutTimeout(args, startIndex, streamCount, outputStream, responseMap);
+            return;
+        }
+
+        blockWithTimeout(args, startIndex, streamCount, outputStream, endTime, responseMap, timeout);
+
+    }
+
+    private void blockWithTimeout(List<String> args, int startIndex, int streamCount, OutputStream outputStream, long endTime, Map<String, Map<String, KeyValue>> responseMap, boolean timeout) throws IOException {
         while (System.currentTimeMillis() < endTime) {
             if (responseMap != null && !responseMap.isEmpty()) {
                 timeout = false;
@@ -69,7 +78,7 @@ public class XReadCommand implements IRedisCommandHandler{
             responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 1, null);
 
         }
-       // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
+        // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
 
         if(!timeout && !responseMap.isEmpty()){
             sendArrayRESPresponseForXRead(outputStream, responseMap);
@@ -77,8 +86,18 @@ public class XReadCommand implements IRedisCommandHandler{
             // If no new data was added within the block timeout, return null response
             sendBulkStringResponse(outputStream,"","There's a timeout or no value");
         }
+    }
 
-
+    private void blockWithoutTimeout(List<String> args, int startIndex, int streamCount, OutputStream outputStream, Map<String, Map<String, KeyValue>> responseMap) throws IOException {
+        while(responseMap == null && responseMap.isEmpty()){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 1, null);
+        }
+        sendArrayRESPresponseForXRead(outputStream, responseMap);
     }
 
     private Map<String, Map<String, KeyValue>> processingStreamsDataForXRead(List<String> args, int startIndex, int streamCount, int k, OutputStream outputStream) throws IOException {
