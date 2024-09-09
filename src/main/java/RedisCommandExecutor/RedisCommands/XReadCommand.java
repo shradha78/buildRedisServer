@@ -125,7 +125,7 @@ public class XReadCommand implements IRedisCommandHandler{
                     }
                     rangeFrom = parseIdToRange(lastStreamId);
                 }else{
-                    rangeFrom = Long.parseLong(id);
+                    rangeFrom = parseIdToRange(id);
 
                 }
 
