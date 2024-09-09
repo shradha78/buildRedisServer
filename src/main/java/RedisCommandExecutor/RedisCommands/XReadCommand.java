@@ -1,14 +1,12 @@
 package RedisCommandExecutor.RedisCommands;
 
-import DataUtils.StreamsData;
+import DataUtils.RedisStreams;
 import RedisServer.ClientSession;
 import DataUtils.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 
 import static RedisResponses.LongParsedResponses.sendArrayRESPresponseForXRead;
@@ -19,6 +17,7 @@ public class XReadCommand implements IRedisCommandHandler{
     private static final long POLL_INTERVAL_MS = 100;
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
+        System.out.println("#######XReadCommand");
         int startIndex = 1;
         int numberOfArgs = args.size();
         int streamCount = numberOfArgs / 2 ;
@@ -40,6 +39,7 @@ public class XReadCommand implements IRedisCommandHandler{
             handleBlockingXRead(args, startIndex, streamCountPairs, blockTimeout, outputStream, session);
         } else {
             // Handle non-blocking XREAD
+            System.out.println("Handling without block ");
             Map<String, Map<String, KeyValue>> responseMap =  processingStreamsDataForXRead(args, startIndex, streamCount, 0,outputStream);
             sendArrayRESPresponseForXRead(outputStream, responseMap);
         }
@@ -47,66 +47,43 @@ public class XReadCommand implements IRedisCommandHandler{
 
     private void handleBlockingXRead(List<String> args, int startIndex, int streamCount, long blockTimeout, OutputStream outputStream, ClientSession session) throws IOException {
 
-//        long startTime = System.currentTimeMillis();
-//
-//        long endTime = startTime + blockTimeout;
-//
-//        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
-//
-//        boolean timeout = true;
-
-//        while (System.currentTimeMillis() < endTime) {
-//            if (responseMap != null || !responseMap.isEmpty()) {
-//                timeout = false;
-//                break;
-//            }
-//            try {
-//                Thread.sleep(100);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
-//
-//            responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
-//
-//        }
-//       // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
-//
-//        if(!timeout && !responseMap.isEmpty()){
-//            sendArrayRESPresponseForXRead(outputStream, responseMap);
-//        }else{
-//            // If no new data was added within the block timeout, return null response
-//            sendBulkStringResponse(outputStream,"","There's a timeout or no value");
-//        }
-
         long startTime = System.currentTimeMillis();
-        CountDownLatch latch = new CountDownLatch(1);
-        for (String streamKey : StreamsData.streams.keySet()) {
-            StreamThreadHandler.registerStreamLatch(streamKey, latch);
-        }
-        if  (System.currentTimeMillis() - startTime < blockTimeout) {
-            // Wait for new data with timeout
-            try {
-                latch.await(Math.max(1, blockTimeout -
-                                (System.currentTimeMillis() - startTime)),
-                        TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        Map<String, Map<String, KeyValue>> responseMap   = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
 
-        if( !responseMap.isEmpty()){
+        long endTime = startTime + blockTimeout;
+
+        Map<String, Map<String, KeyValue>> responseMap = new HashMap<>();
+
+        boolean timeout = true;
+
+        while (System.currentTimeMillis() < endTime) {
+            if (responseMap != null || !responseMap.isEmpty()) {
+                timeout = false;
+                break;
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
+
+        }
+       // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
+
+        if(!timeout && !responseMap.isEmpty()){
             sendArrayRESPresponseForXRead(outputStream, responseMap);
         }else{
             // If no new data was added within the block timeout, return null response
             sendBulkStringResponse(outputStream,"","There's a timeout or no value");
         }
 
+
     }
 
     private Map<String, Map<String, KeyValue>> processingStreamsDataForXRead(List<String> args, int startIndex, int streamCount, int k, OutputStream outputStream) throws IOException {
         Map<String, Map<String, KeyValue>> responseMap = new LinkedHashMap<>();
-        System.out.println("In Process Streams \n");
+        System.out.println("Retrieving values for XREAD");
 
         int currentIndex = startIndex;
         String key = "";
@@ -122,7 +99,7 @@ public class XReadCommand implements IRedisCommandHandler{
 
                 long rangeFrom = parseIdToRange(id);
 
-                RedisStreams streamKey = DataUtils.StreamsData.getStreamData(key);
+                RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForProcessingXREAD(key);
                 if (streamKey != null) {
 
                     System.out.println("There's value for this key in stream \n");

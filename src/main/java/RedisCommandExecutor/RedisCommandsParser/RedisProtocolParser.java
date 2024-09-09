@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RedisProtocolParser {
-    public List<String> parseRESPMessage(BufferedReader br) throws IOException {
-        List<String> mainMessageParts = new ArrayList<>();
+
+    public List<String> parseRESPMessage(BufferedReader br, long currentTimestamp) throws IOException {
+        List<String> mainInputLines = new ArrayList<>();
         System.out.println("IN parsing RESP Message");
 
         String line = br.readLine();
-
+        currentTimestamp = System.currentTimeMillis();
         System.out.println("******* Next Line ");
 
         if(line == null || !line.startsWith("*") || line.isEmpty()){
@@ -27,9 +28,9 @@ public class RedisProtocolParser {
         for(int i = 0; i < numberOfArguments;i++){
             br.readLine(); //Skipping length arguments
             String message = br.readLine();
-            mainMessageParts.add(message); //will contain command and message string
+            mainInputLines.add(message); //will contain command and message string
         }
 
-        return mainMessageParts;
+        return mainInputLines;
     }
 }

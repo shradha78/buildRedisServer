@@ -11,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-import static DataUtils.QueueCommands.queueCommands;
+import static DataUtils.CommandsQueue.queueCommands;
 
 import static RedisResponses.ShortParsedResponses.sendErrorResponse;
 
@@ -85,17 +85,22 @@ public class Main {
         try {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
+
             OutputStream outputStream = clientSocket.getOutputStream();
+
             PrintWriter printWriter = new PrintWriter(outputStream, true);
 
            while (true) {
                 try {
                     System.out.println("Sending commands for parsing \n");
+                    long currentTime = 0;
+                    //parsing input from the client
+                    List<String> parsedInput = redisProtocolParser.parseRESPMessage(br,currentTime);
 
-                    List<String> messageParts = redisProtocolParser.parseRESPMessage(br);
+                    //After parsing the input from client, separating command and its arguments
+                    RedisCommand command = redisCommandParser.parseCommand(parsedInput, currentTime);
 
-                    RedisCommand command = redisCommandParser.parseCommand(messageParts);//simply putting it to a custom DS Redis Command
-
+                    //maintaining queue of commands, specifically for MULTI and EXEC Command
                     queueCommands(command, session);
 
                     processCommand(command,outputStream,session);//based on commands, it will process output

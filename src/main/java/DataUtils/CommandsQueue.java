@@ -5,7 +5,7 @@ import RedisCommandExecutor.RedisCommandsParser.RedisCommand;
 
 import java.util.Queue;
 
-public class QueueCommands {
+public class CommandsQueue {
 
     public static void queueCommands(RedisCommand command, ClientSession session) {
 

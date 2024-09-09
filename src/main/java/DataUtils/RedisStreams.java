@@ -1,23 +1,18 @@
-package RedisCommandExecutor.RedisCommands;
-
-import DataUtils.Constants;
-import DataUtils.KeyValue;
+package DataUtils;
 
 import java.util.*;
 
 public class RedisStreams {
     private final String streamKey;
-    private final Map<String, KeyValue> streamsDataPerTimestamp;//stream key, <ID Value>
-    private long lastTimestamp;
-    private long sequenceNumber;
+    private final Map<String, KeyValue> streamsDataPerTimestamp;//stream key, <timestamp Value>
+    private long lastTimestamp = 0;
+    private long sequenceNumber = 0;
     private String lastStreamId = "";
 
 
-    public RedisStreams(String streamKey) {
+    public RedisStreams(String streamKey,Map<String, KeyValue> streamsDataPerTimestamp ) {
         this.streamKey = streamKey;
-        this.streamsDataPerTimestamp = new LinkedHashMap<>();
-        this.lastTimestamp = 0;
-        this.sequenceNumber = 0;
+        this.streamsDataPerTimestamp = streamsDataPerTimestamp;
     }
 
     public String addEntryToStreamID(String id, KeyValue entry) throws InterruptedException {
@@ -29,6 +24,7 @@ public class RedisStreams {
             }
             System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
             streamsDataPerTimestamp.put(id, entry);
+            StreamsData.addDataToStreams(streamKey,new RedisStreams(streamKey,streamsDataPerTimestamp));
             lastStreamId = id;
 
         } catch (Exception e) {
@@ -89,7 +85,7 @@ public class RedisStreams {
 
         long idTimestamp = Long.parseLong(idSplit[0]);
 
-        long idSequenceNum = idSplit[1].equals("*") ? 10000000 : Long.parseLong(idSplit[1]);
+        long idSequenceNum = idSplit[1].equals("*") ? 10000000 : Long.parseLong(idSplit[1]);//if id is 1-*, then also its valid
 
         if(idSequenceNum == 10000000 ) return Constants.VALID;
 
@@ -100,11 +96,11 @@ public class RedisStreams {
         }
 
         if (!lastStreamId.isEmpty()) {
-            String[] lastIdSplit = lastStreamId.split("-");
-            long lastIdTimestamp = Long.parseLong(lastIdSplit[0]);
-            long lastIdSequence = Long.parseLong(lastIdSplit[1]);
+            String[] lastStreamIdSplit = lastStreamId.split("-");
+            long lastStreamIdTimestamp = Long.parseLong(lastStreamIdSplit[0]);
+            long lastStreamIdSequence = Long.parseLong(lastStreamIdSplit[1]);
 
-            if (idTimestamp < lastIdTimestamp || (idTimestamp == lastIdTimestamp && idSequenceNum <= lastIdSequence)) {
+            if (idTimestamp < lastStreamIdTimestamp || (idTimestamp == lastStreamIdTimestamp && idSequenceNum <= lastStreamIdSequence)) {
                 return Constants.EQUAL_OR_SMALLER;
             }
         }

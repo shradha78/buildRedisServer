@@ -1,5 +1,6 @@
 package RedisCommandExecutor.RedisCommands;
 
+import DataUtils.RedisStreams;
 import RedisServer.ClientSession;
 import DataUtils.KeyValue;
 
@@ -28,7 +29,7 @@ public class XRangeCommand implements IRedisCommandHandler{
             }
         }
 
-        RedisStreams streamKey = DataUtils.StreamsData.getStreamData(key);
+        RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForProcessingXREAD(key);
         Map<String, KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfStreamsDataWithinRange(rangeFrom, rangeTo);
         sendArrayRESPresponse(outputStream, listOfValuesInStreamWithKey);
     }

@@ -1,7 +1,6 @@
 package DataUtils;
 
-import RedisCommandExecutor.RedisCommands.RedisStreams;
-
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,8 +15,12 @@ public class StreamsData {
         streams.put(streamKey, stream);
     }
 
-    public static RedisStreams getStreamData(String streamKey) {
-        return streams.containsKey(streamKey) ? streams.get(streamKey) : new RedisStreams(streamKey);
+    public static RedisStreams getStreamDataForProcessingXREAD(String streamKey) {
+        return streams.containsKey(streamKey) ? streams.get(streamKey) : null;
+    }
+
+    public static RedisStreams getStreamDataForValidation(String streamKey) {
+        return streams.containsKey(streamKey) ? streams.get(streamKey) : new RedisStreams(streamKey, new LinkedHashMap<>());
     }
 
     public static boolean containsStreamKey(String streamKey) {

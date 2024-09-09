@@ -1,13 +1,13 @@
 package RedisCommandExecutor.RedisCommands;
 
 import DataUtils.Constants;
+import DataUtils.RedisStreams;
 import RedisServer.ClientSession;
 import DataUtils.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 import static RedisResponses.ShortParsedResponses.sendBulkStringResponse;
 import static RedisResponses.ShortParsedResponses.sendErrorResponse;
@@ -21,7 +21,7 @@ public class XaddCommand implements IRedisCommandHandler{
         String streamKeyId = args.get(1);
         KeyValue newKeyValueToBeAdded = new KeyValue(args.get(2), args.get(3), 0);
 
-        RedisStreams redisStreams = DataUtils.StreamsData.getStreamData(streamKey);
+        RedisStreams redisStreams = DataUtils.StreamsData.getStreamDataForValidation(streamKey);
         Constants validationResult = redisStreams.validateStreamId(streamKeyId);
 
         if (validationResult != Constants.VALID) {
@@ -32,18 +32,7 @@ public class XaddCommand implements IRedisCommandHandler{
 
                 streamKeyId = redisStreams.addEntryToStreamID(streamKeyId, newKeyValueToBeAdded);
                 System.out.println("Is the key added to streams ? : "  + redisStreams.checkIfValueIsAddedToMainStreams(streamKeyId) + "\n");
-                redisStreams.notifyAll();
-
-            synchronized (StreamThreadHandler.streamLatches) {
-                List<CountDownLatch> latches =
-                        StreamThreadHandler.streamLatches.get(streamKey);
-                if (latches != null) {
-                    for (CountDownLatch latch : latches) {
-                        latch.countDown();
-                    }
-                    StreamThreadHandler.streamLatches.remove(streamKey);
-                }
-            }
+//                redisStreams.notifyAll();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
