@@ -120,6 +120,9 @@ public class XReadCommand implements IRedisCommandHandler{
                 long rangeFrom = 0;
                 if(id.equals("$")){
                     String lastStreamId = RedisStreams.getSecondLastStreamTimestamp(key);
+                    if(lastStreamId.isEmpty()){
+                        return  responseMap;
+                    }
                     rangeFrom = parseIdToRange(lastStreamId);
                 }else{
                     rangeFrom = Long.parseLong(id);
