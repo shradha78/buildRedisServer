@@ -26,7 +26,7 @@ public class RedisStreams {
             }
             System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
             streamsDataPerTimestamp.put(id, entry);
-            StreamsData.addDataToStreams(streamKey,new RedisStreams(streamKey,streamsDataPerTimestamp,sequenceNumber,System.currentTimeMillis()));
+            StreamsData.addDataToStreams(streamKey,new RedisStreams(streamKey,streamsDataPerTimestamp,sequenceNumber,lastTimestamp));
             lastStreamId = id;
 
         } catch (Exception e) {
