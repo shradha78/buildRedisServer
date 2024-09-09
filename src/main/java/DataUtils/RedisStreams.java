@@ -7,7 +7,7 @@ public class RedisStreams {
     private final Map<String, KeyValue> streamsDataPerTimestamp;//stream key, <timestamp Value>
     private long lastTimestamp = 0;
     private long sequenceNumber = 0;
-    private String lastStreamId = "";
+    private static String lastStreamId = "";
 
 
     public RedisStreams(String streamKey,Map<String, KeyValue> streamsDataPerTimestamp, long sequenceNumber, long lastTimestamp, String lastStreamId) {
