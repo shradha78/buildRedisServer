@@ -20,7 +20,7 @@ public class XReadCommand implements IRedisCommandHandler{
         System.out.println("#######XReadCommand");
         int startIndex = 1;
         int numberOfArgs = args.size();
-        int streamCount = numberOfArgs / 2 ;
+        int streamCount = (numberOfArgs-1) / 2 ;
         boolean isBlocked = false;
         long blockTimeout = 0;
         int streamCountPairs = streamCount / 2;
@@ -28,19 +28,19 @@ public class XReadCommand implements IRedisCommandHandler{
         // Check if BLOCK keyword is present and adjust arguments parsing
         if (args.get(0).equalsIgnoreCase("BLOCK")) {
             startIndex = 3;
-            streamCount = (numberOfArgs - 3);
+            streamCount = (numberOfArgs - 3)/2 +2;
             blockTimeout = Long.parseLong(args.get(1));
             isBlocked = true;
-            streamCountPairs = streamCount / 2 - 1;
+            streamCountPairs = numberOfArgs - 1;
         }
 
         if (isBlocked) {
             // Handle blocking with timeout
-            handleBlockingXRead(args, startIndex, streamCountPairs, blockTimeout, outputStream, session);
+            handleBlockingXRead(args, startIndex, streamCount, blockTimeout, outputStream, session);
         } else {
             // Handle non-blocking XREAD
             System.out.println("Handling without block ");
-            Map<String, Map<String, KeyValue>> responseMap =  processingStreamsDataForXRead(args, startIndex, streamCount, 0,outputStream);
+            Map<String, Map<String, KeyValue>> responseMap =  processingStreamsDataForXRead(args, startIndex, streamCount, streamCount,outputStream);
             sendArrayRESPresponseForXRead(outputStream, responseMap);
         }
     }
@@ -66,7 +66,7 @@ public class XReadCommand implements IRedisCommandHandler{
                 Thread.currentThread().interrupt();
             }
 
-            responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, null);
+            responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 1, null);
 
         }
        // responseMap = processingStreamsDataForXRead(args, startIndex, streamCount, 3, outputStream);
@@ -91,9 +91,9 @@ public class XReadCommand implements IRedisCommandHandler{
             for (int i = startIndex; i <= streamCount; i++) {
                 System.out.println("Checking if being processed here \n");
 
-                key = args.get(i + k);
+                key = args.get(i);
 
-                id = args.get(i + k + streamCount);
+                id = args.get(i + k);
 
                 System.out.printf("key = %s , id = %s \n",key,id);
 
