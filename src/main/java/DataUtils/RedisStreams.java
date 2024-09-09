@@ -10,9 +10,11 @@ public class RedisStreams {
     private String lastStreamId = "";
 
 
-    public RedisStreams(String streamKey,Map<String, KeyValue> streamsDataPerTimestamp ) {
+    public RedisStreams(String streamKey,Map<String, KeyValue> streamsDataPerTimestamp, long sequenceNumber, long lastTimestamp ) {
         this.streamKey = streamKey;
         this.streamsDataPerTimestamp = streamsDataPerTimestamp;
+        this.sequenceNumber = sequenceNumber;
+        this.lastTimestamp = lastTimestamp;
     }
 
     public String addEntryToStreamID(String id, KeyValue entry) throws InterruptedException {
@@ -24,7 +26,7 @@ public class RedisStreams {
             }
             System.out.printf("XADD adding entry at start time: %d\n", System.currentTimeMillis());
             streamsDataPerTimestamp.put(id, entry);
-            StreamsData.addDataToStreams(streamKey,new RedisStreams(streamKey,streamsDataPerTimestamp));
+            StreamsData.addDataToStreams(streamKey,new RedisStreams(streamKey,streamsDataPerTimestamp,sequenceNumber,System.currentTimeMillis()));
             lastStreamId = id;
 
         } catch (Exception e) {

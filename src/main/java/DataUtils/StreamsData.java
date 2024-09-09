@@ -20,7 +20,7 @@ public class StreamsData {
     }
 
     public static RedisStreams getStreamDataForValidation(String streamKey) {
-        return streams.containsKey(streamKey) ? streams.get(streamKey) : new RedisStreams(streamKey, new LinkedHashMap<>());
+        return streams.containsKey(streamKey) ? streams.get(streamKey) : new RedisStreams(streamKey, new LinkedHashMap<>(),0,0);
     }
 
     public static boolean containsStreamKey(String streamKey) {
