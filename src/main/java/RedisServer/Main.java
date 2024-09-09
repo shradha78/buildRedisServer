@@ -113,7 +113,13 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            clientSocket.close();
+            try {
+                if (clientSocket != null && !clientSocket.isClosed()) {
+                    clientSocket.close();
+                }
+            } catch (IOException e) {
+                System.out.println("IOException while closing socket: " + e.getMessage());
+            }
         }
     }
 
