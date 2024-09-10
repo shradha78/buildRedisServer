@@ -172,10 +172,6 @@ public class RedisStreams {
         return streamsDataPerTimestamp.containsKey(streamKey);
     }
 
-    public static String getLastStreamId(){
-        return lastStreamId;
-    }
-
     public static String getSecondLastStreamTimestamp(String streamKey) {
         List<Map.Entry<String,KeyValue>> entryList = new ArrayList<>(StreamsData.streams.get(streamKey).streamsDataPerTimestamp.entrySet());
 

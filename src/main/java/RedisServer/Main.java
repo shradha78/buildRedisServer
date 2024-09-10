@@ -23,6 +23,9 @@ public class Main {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here!");
 
+        //handling command line arguments for Config Get command
+        DataUtils.ConfigurationData.handleTestArgumentsForConfigValues(args);
+
         Socket clientSocket = null;
 
         int port = 6379;
