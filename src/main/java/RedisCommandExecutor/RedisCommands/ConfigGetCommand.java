@@ -4,6 +4,7 @@ import RedisServer.ClientSession;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigGetCommand implements IRedisCommandHandler{
@@ -15,9 +16,11 @@ public class ConfigGetCommand implements IRedisCommandHandler{
 
         String configValue = DataUtils.ConfigurationData.getConfigDetails(configName);
 
-        RedisResponses.ShortParsedResponses.sendBulkStringResponse(outputStream,configName,"The name of Config asked in Input");
-        RedisResponses.ShortParsedResponses.sendBulkStringResponse(outputStream,configValue,"The value of Config asked in Input");
+        List<String> response = new ArrayList<>();
+        response.add(configName);
+        response.add(configValue);
 
+        RedisResponses.LongParsedResponses.sendArrayRESPresponseForStrings(outputStream,response);
 
     }
 }

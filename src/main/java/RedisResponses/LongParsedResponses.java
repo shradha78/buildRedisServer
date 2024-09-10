@@ -4,11 +4,12 @@ import DataUtils.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 public class LongParsedResponses {
 
-    public static void sendArrayRESPresponse(OutputStream outputStream, Map<String, KeyValue> list) throws IOException {
+    public static void sendArrayRESPresponseForKeyValues(OutputStream outputStream, Map<String, KeyValue> list) throws IOException {
         StringBuilder sb = new StringBuilder();
         System.out.println("WRITING RESPONSE");
 
@@ -89,4 +90,15 @@ public class LongParsedResponses {
         // Write the entire response to the output stream
         outputStream.write(sb.toString().getBytes());
     }
+
+    public static void sendArrayRESPresponseForStrings(OutputStream outputStream, List<String> list) throws IOException{
+        StringBuilder sb = new StringBuilder();
+        sb.append("*").append(list.size()).append("\r\n");
+        for(String s : list){
+            sb.append("$").append(s.length()).append("\r\n");
+            sb.append(s).append("\r\n");
+        }
+        outputStream.write(sb.toString().getBytes());
+    }
+
 }

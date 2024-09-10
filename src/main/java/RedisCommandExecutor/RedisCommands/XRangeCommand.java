@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import static RedisResponses.LongParsedResponses.sendArrayRESPresponse;
+import static RedisResponses.LongParsedResponses.sendArrayRESPresponseForKeyValues;
 
 public class XRangeCommand implements IRedisCommandHandler{
     @Override
@@ -31,7 +31,7 @@ public class XRangeCommand implements IRedisCommandHandler{
 
         RedisStreams streamKey = DataUtils.StreamsData.getStreamDataForProcessingXREAD(key);
         Map<String, KeyValue> listOfValuesInStreamWithKey = streamKey.getListOfStreamsDataWithinRange(rangeFrom, rangeTo);
-        sendArrayRESPresponse(outputStream, listOfValuesInStreamWithKey);
+        sendArrayRESPresponseForKeyValues(outputStream, listOfValuesInStreamWithKey);
     }
 
     private boolean isSpecificRange(List<String> args) {
