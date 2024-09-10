@@ -1,4 +1,4 @@
-package RedisCommandExecutor.RedisCommandsParser;
+package RedisCommandExecutor.RedisParser;
 
 import java.util.List;
 

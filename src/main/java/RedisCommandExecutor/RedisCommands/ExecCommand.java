@@ -1,7 +1,7 @@
 package RedisCommandExecutor.RedisCommands;
 
 import RedisServer.ClientSession;
-import RedisCommandExecutor.RedisCommandsParser.RedisCommand;
+import RedisCommandExecutor.RedisParser.RedisCommand;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

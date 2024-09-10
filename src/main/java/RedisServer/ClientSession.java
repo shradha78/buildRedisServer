@@ -1,6 +1,6 @@
 package RedisServer;
 
-import RedisCommandExecutor.RedisCommandsParser.RedisCommand;
+import RedisCommandExecutor.RedisParser.RedisCommand;
 
 import java.util.LinkedList;
 import java.util.Queue;

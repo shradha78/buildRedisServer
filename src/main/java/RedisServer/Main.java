@@ -2,9 +2,9 @@ package RedisServer;
 
 import RedisCommandExecutor.RedisCommands.CommandFactory;
 import RedisCommandExecutor.RedisCommands.IRedisCommandHandler;
-import RedisCommandExecutor.RedisCommandsParser.RedisCommand;
-import RedisCommandExecutor.RedisCommandsParser.RedisCommandParser;
-import RedisCommandExecutor.RedisCommandsParser.RedisProtocolParser;
+import RedisCommandExecutor.RedisParser.RedisCommand;
+import RedisCommandExecutor.RedisParser.RedisCommandParser;
+import RedisCommandExecutor.RedisParser.RedisProtocolParser;
 
 import java.io.*;
 import java.net.ServerSocket;
