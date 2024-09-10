@@ -21,6 +21,7 @@ public class CommandFactory {
         commands.put("XRANGE", new XRangeCommand());
         commands.put("XREAD", new XReadCommand());
         commands.put("CONFIG", new ConfigGetCommand());
+        commands.put("KEYS", new KeysCommand());
 
     }
 
