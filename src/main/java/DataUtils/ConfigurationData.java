@@ -11,10 +11,10 @@ public class ConfigurationData {
     public static void handleTestArgumentsForConfigValues(String[] args) {
         for(int i = 0 ; i < args.length ; i++) {
             if(args[i].equals("--dir")) {
-                addConfigDetails(args[i] ,args[++i]);
+                addConfigDetails("dir" ,args[++i]);
             }
             if(args[i].equals("--dbfilename")) {
-                addConfigDetails(args[i] ,args[++i]);
+                addConfigDetails("dbfilename" ,args[++i]);
             }
         }
     }
