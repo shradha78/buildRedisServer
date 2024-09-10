@@ -15,7 +15,7 @@ public class KeysCommand implements IRedisCommandHandler{
         File rdbFile = new File(filePath);
         if (!rdbFile.exists()) {
             System.out.println("RDB file not found. Treating database as empty.");
-            RedisResponses.ShortParsedResponses.sendBulkStringResponse(outputStream, "","The database is empty");
+            RedisResponses.LongParsedResponses.sendArrayRESPresponseForStrings(outputStream,new ArrayList<>());
             return;
         }
         handleAllKeys(args, outputStream);
