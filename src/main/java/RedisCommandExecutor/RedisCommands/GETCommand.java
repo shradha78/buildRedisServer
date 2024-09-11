@@ -14,6 +14,7 @@ import RedisCommandExecutor.RedisParser.RdbParser;
 import RedisServer.ClientSession;
 import DataUtils.KeyValue;
 
+import static DataUtils.RdbDataHandler.parsingRDBFile;
 import static RedisResponses.ShortParsedResponses.sendBulkStringResponse;
 
 
@@ -31,22 +32,7 @@ public class GETCommand implements IRedisCommandHandler{
 
         System.out.println("Key here is : " + key);
 
-        String dir = ConfigurationData.getConfigDetails("dir");
-        String file = ConfigurationData.getConfigDetails("dbfilename");
-        Path filePath = null;
-        if(dir != null && file != null) {
-            filePath = Paths.get(dir, file);
-            if (Files.exists(filePath)) {
-                try {
-                    RdbParser.load(filePath);
-                    System.out.println("File loaded");
-                } catch (Exception e) {
-                    System.out.println("Exception loading rdb file " + e);
-                    System.out.println("RDB file not found. Treating database as empty.");
-                    RedisResponses.LongParsedResponses.sendArrayRESPresponseForStrings(outputStream, new ArrayList<>());
-                }
-            }
-        }
+        parsingRDBFile(outputStream);//In case the key exists in db file
 
         KeyValue keyValue = DataUtils.KeyValuePairData.getSpecificKeyDetails(key);
 

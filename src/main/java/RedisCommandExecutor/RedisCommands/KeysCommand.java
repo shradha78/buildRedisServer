@@ -12,25 +12,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static DataUtils.RdbDataHandler.parsingRDBFile;
+
 public class KeysCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        String dir = ConfigurationData.getConfigDetails("dir");
-        String file = ConfigurationData.getConfigDetails("dbfilename");
-        Path filePath = null;
-        if(dir != null && file != null) {
-            filePath = Paths.get(dir, file);
-            if(Files.exists(filePath)) {
-                try {
-                    RdbParser.load(filePath);
-                    System.out.println("File loaded");
-                } catch (Exception e) {
-                    System.out.println("Exception loading rdb file " + e);
-                    System.out.println("RDB file not found. Treating database as empty.");
-                    RedisResponses.LongParsedResponses.sendArrayRESPresponseForStrings(outputStream,new ArrayList<>());
-                }
-            }
-        }
+        parsingRDBFile(outputStream);
         handleAllKeys(args, outputStream);
     }
 
