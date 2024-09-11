@@ -24,7 +24,6 @@ public class KeysCommand implements IRedisCommandHandler{
                 try {
                     RdbParser.load(filePath);
                     System.out.println("File loaded");
-                    handleAllKeys(args, outputStream);
                 } catch (Exception e) {
                     System.out.println("Exception loading rdb file " + e);
                     System.out.println("RDB file not found. Treating database as empty.");
@@ -32,6 +31,7 @@ public class KeysCommand implements IRedisCommandHandler{
                 }
             }
         }
+        handleAllKeys(args, outputStream);
     }
 
     private static void handleAllKeys(List<String> args, OutputStream outputStream) throws IOException {
