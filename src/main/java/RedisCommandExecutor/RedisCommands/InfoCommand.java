@@ -11,8 +11,15 @@ public class InfoCommand implements IRedisCommandHandler{
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("INFO Command");
         String infoArgument = args.get(0);
+        String role = "";
+
         if(infoArgument.equals("replication")){
-            RedisResponses.ShortParsedResponses.sendBulkStringResponse(outputStream,"role:master","Info command output is : ");
+            if(DataUtils.ReplicationDataHandler.isIsReplica()){
+                role = "slave";
+            }else{
+                role = "master";
+            }
+            RedisResponses.ShortParsedResponses.sendBulkStringResponse(outputStream,"role:"+role,"Info command output is : ");
         }
     }
 }
