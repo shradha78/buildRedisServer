@@ -20,7 +20,7 @@ public class ShortParsedResponses {
         String responseBulkString = "$" + value.length() + "\r\n" + value + "\r\n";
         System.out.println(debugPrintStatement + responseBulkString + "\n");
         outputStream.write(responseBulkString.getBytes());
-        outputStream.flush();
+       // outputStream.flush();
     }
 
     public static void sendErrorResponse(OutputStream outputStream, String message) throws IOException {
