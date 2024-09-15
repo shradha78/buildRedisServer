@@ -18,13 +18,14 @@ import static RedisResponses.ShortParsedResponses.sendErrorResponse;
 public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
+    public static int portToConnect = 0;
 
     public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here!");
 
         //handling command line arguments for Config Get command
-        DataUtils.ConfigurationData.handleTestArgumentsForConfigValues(args);
+        DataUtils.ConfigurationData.handleTestArgumentsForConfigurations(args);
 
         Socket clientSocket = null;
 
@@ -43,6 +44,7 @@ public class Main {
         redisProtocolParser = new RedisProtocolParser();
 
         try {
+            port = portToConnect != 0  ? portToConnect : port;
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
