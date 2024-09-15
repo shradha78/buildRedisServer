@@ -45,7 +45,7 @@ public class Main {
         redisProtocolParser = new RedisProtocolParser();
 
         try {
-            port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.portToConnect : port;
+            port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
