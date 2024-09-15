@@ -1,5 +1,6 @@
 package RedisCommandExecutor.RedisCommands;
 
+import RedisReplication.RedisInstance;
 import RedisServer.ClientSession;
 
 import java.io.IOException;
@@ -11,22 +12,20 @@ public class InfoCommand implements IRedisCommandHandler{
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("INFO Command");
         String infoArgument = args.get(0);
-        String role = "";
-        String master_replid = "";
-        String master_repl_offset = "";
+        RedisReplication.RedisInstance redisInstance = new RedisInstance();
 
         if(infoArgument.equals("replication")) {
             if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-                role = "slave";
+              redisInstance.setRole("slave");
             } else {
-                role = "master";
-                master_replid = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
-                master_repl_offset = "0";
+                redisInstance.setRole("master");
+                redisInstance.setReplicationId("8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
+                redisInstance.setReplicationOffset("0");
             }
             StringBuilder sb = new StringBuilder();
-            sb.append("role:").append(role).append("\n");
-            sb.append("master_replid:").append(master_replid).append("\n");
-            sb.append("master_repl_offset:").append(master_repl_offset).append("\n");
+            sb.append("role:").append(redisInstance.getRole()).append("\n");
+            sb.append("master_replid:").append(redisInstance.getReplicationId()).append("\n");
+            sb.append("master_repl_offset:").append(redisInstance.getReplicationOffset()).append("\n");
             RedisResponses.ShortParsedResponses.sendResponseForInfo(outputStream,sb.toString());
         }
     }
