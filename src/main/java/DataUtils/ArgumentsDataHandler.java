@@ -27,9 +27,7 @@ public class ArgumentsDataHandler {
                 if (parts.length == 2) {
                     ReplicationDataHandler.setMaster_host(parts[0]);
                     ReplicationDataHandler.setMaster_port(Integer.parseInt(parts[1]));
-                    if(RedisInstance.getRole().equals("slave")) {
-                        ReplicationDataHandler.sendPingToMaster(ReplicationDataHandler.getMaster_host(), ReplicationDataHandler.getMaster_port());
-                    }
+                    ReplicationDataHandler.sendPingToMaster(ReplicationDataHandler.getMaster_host(), ReplicationDataHandler.getMaster_port());
                 }
             }
         }
