@@ -66,7 +66,7 @@ public class Main {
 
                         ClientSession session = new ClientSession();
 
-                        handlingClientCommands(finalClientSocket, session);
+                        handlingClientCommands(finalClientSocket, session,args);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -88,7 +88,7 @@ public class Main {
         }
     }
 
-    private static void handlingClientCommands(Socket clientSocket, ClientSession session) throws IOException {
+    private static void handlingClientCommands(Socket clientSocket, ClientSession session, String[] args) throws IOException {
 
         try {
             BufferedReader br = new BufferedReader(
@@ -103,6 +103,8 @@ public class Main {
 
            while (true) {
                 try {
+                    //handling command line arguments
+                    DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
                     System.out.println("Sending commands for parsing \n");
                     long currentTime = 0;
 
