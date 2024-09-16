@@ -100,6 +100,10 @@ public class Main {
                 try {
                     System.out.println("Sending commands for parsing \n");
                     long currentTime = 0;
+
+                    if(ReplicationDataHandler.isIsReplica()){
+                        Main.processCommand(new RedisCommand("PING", null, 0),outputStream, session);
+                    }
                     //parsing input from the client
                     List<String> parsedInput = redisProtocolParser.parseRESPMessage(br,currentTime);
 
