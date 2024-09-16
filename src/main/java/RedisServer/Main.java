@@ -32,11 +32,11 @@ public class Main {
 
         int port = 6379;
 
-        listenToPort(clientSocket, port);
+        listenToPort(clientSocket, port,args);
 
     }
 
-    private static void listenToPort(Socket clientSocket, int port) {
+    private static void listenToPort(Socket clientSocket, int port, String[] args) {
 
         ServerSocket serverSocket;
 
@@ -45,6 +45,8 @@ public class Main {
         redisProtocolParser = new RedisProtocolParser();
 
         try {
+            //handling command line arguments
+            DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
             port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
