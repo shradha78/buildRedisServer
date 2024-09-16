@@ -97,9 +97,6 @@ public class Main {
             OutputStream outputStream = clientSocket.getOutputStream();
 
             PrintWriter printWriter = new PrintWriter(outputStream, true);
-            if(ReplicationDataHandler.isIsReplica()){
-                processCommand(new RedisCommand("PING", null, 0),outputStream, session);
-            }
 
            while (true) {
                 try {
