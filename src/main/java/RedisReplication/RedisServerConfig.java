@@ -1,6 +1,6 @@
 package RedisReplication;
 
-public class RedisInstance {
+public class RedisServerConfig {
     private static String role = "master";
     private static String replicationId="8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
     private static String replicationOffset="0";
@@ -10,7 +10,7 @@ public class RedisInstance {
     }
 
     public static void setRole(String role) {
-        RedisInstance.role = role;
+        RedisServerConfig.role = role;
     }
 
     public static String getReplicationId() {
@@ -18,7 +18,7 @@ public class RedisInstance {
     }
 
     public static void setReplicationId(String replicationId) {
-        RedisInstance.replicationId = replicationId;
+        RedisServerConfig.replicationId = replicationId;
     }
 
     public static String getReplicationOffset() {
@@ -26,6 +26,6 @@ public class RedisInstance {
     }
 
     public static void setReplicationOffset(String replicationOffset) {
-        RedisInstance.replicationOffset = replicationOffset;
+        RedisServerConfig.replicationOffset = replicationOffset;
     }
 }

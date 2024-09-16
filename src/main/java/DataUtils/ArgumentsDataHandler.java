@@ -1,9 +1,9 @@
 package DataUtils;
 
-import RedisCommandExecutor.RedisCommands.PingCommand;
-import RedisCommandExecutor.RedisParser.RedisCommand;
-import RedisReplication.RedisInstance;
-import RedisServer.Main;
+import RedisReplication.RedisServerConfig;
+import RedisReplication.RedisSlaveServer;
+
+import java.io.IOException;
 
 public class ArgumentsDataHandler {
 
@@ -21,13 +21,22 @@ public class ArgumentsDataHandler {
             }
             if (args[i].equals("--replicaof")) {
                 ReplicationDataHandler.setIsReplica(true);
-                RedisReplication.RedisInstance.setRole("slave");
+                RedisServerConfig.setRole("slave");
                 String replicaInfo = args[++i];
                 String[] parts = replicaInfo.split(" ");
                 if (parts.length == 2) {
                     ReplicationDataHandler.setMaster_host(parts[0]);
                     ReplicationDataHandler.setMaster_port(Integer.parseInt(parts[1]));
-                    ReplicationDataHandler.sendPingToMaster(ReplicationDataHandler.getMaster_host(), ReplicationDataHandler.getMaster_port());
+                    RedisSlaveServer slaveServer = new RedisSlaveServer(ReplicationDataHandler.getMaster_host(),
+                                                                        ReplicationDataHandler.getMaster_port(),
+                                                                        ReplicationDataHandler.getPortToConnect()
+                                                                        );
+                    try {
+                        slaveServer.connectToMaster();
+                    } catch (IOException e) {
+                        System.out.println("Failed to connect with Master");
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

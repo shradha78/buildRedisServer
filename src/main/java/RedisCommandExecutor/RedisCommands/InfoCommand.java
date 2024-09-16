@@ -1,7 +1,6 @@
 package RedisCommandExecutor.RedisCommands;
 
-import DataUtils.ReplicationDataHandler;
-import RedisReplication.RedisInstance;
+import RedisReplication.RedisServerConfig;
 import RedisServer.ClientSession;
 
 import java.io.IOException;
@@ -13,22 +12,22 @@ public class InfoCommand implements IRedisCommandHandler{
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("INFO Command");
         String infoArgument = args.get(0);
-        RedisReplication.RedisInstance redisInstance = new RedisInstance();
+        RedisServerConfig redisServerConfig = new RedisServerConfig();
 
         if(infoArgument.equals("replication")) {
             if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-              redisInstance.setRole("slave");
-              redisInstance.setReplicationId("");
-              redisInstance.setReplicationOffset("");
+              redisServerConfig.setRole("slave");
+              redisServerConfig.setReplicationId("");
+              redisServerConfig.setReplicationOffset("");
             } else {
-                redisInstance.setRole("master");
-                redisInstance.setReplicationId("8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
-                redisInstance.setReplicationOffset("0");
+                redisServerConfig.setRole("master");
+                redisServerConfig.setReplicationId("8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
+                redisServerConfig.setReplicationOffset("0");
             }
             StringBuilder sb = new StringBuilder();
-            sb.append("role:").append(redisInstance.getRole()).append("\n");
-            sb.append("master_replid:").append(redisInstance.getReplicationId()).append("\n");
-            sb.append("master_repl_offset:").append(redisInstance.getReplicationOffset()).append("\n");
+            sb.append("role:").append(redisServerConfig.getRole()).append("\n");
+            sb.append("master_replid:").append(redisServerConfig.getReplicationId()).append("\n");
+            sb.append("master_repl_offset:").append(redisServerConfig.getReplicationOffset()).append("\n");
             RedisResponses.ShortParsedResponses.sendResponseForInfo(outputStream,sb.toString());
         }
     }

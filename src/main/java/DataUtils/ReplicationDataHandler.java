@@ -1,13 +1,9 @@
 package DataUtils;
 
-import RedisReplication.RedisInstance;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class ReplicationDataHandler {
     private static int portToConnect = 0;

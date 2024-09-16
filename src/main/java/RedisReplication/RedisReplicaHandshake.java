@@ -1,0 +1,66 @@
+package RedisReplication;
+
+import java.io.*;
+import java.net.Socket;
+
+public class RedisReplicaHandshake {
+    private final Socket masterSocket;
+    private final OutputStream outputStream;
+    private final InputStream inputStream;
+    private final int replicaPort;
+
+    public RedisReplicaHandshake(Socket masterSocket, int replicaPort) throws IOException {
+        this.masterSocket = masterSocket;
+        this.outputStream = masterSocket.getOutputStream();
+        this.inputStream = masterSocket.getInputStream();
+        this.replicaPort = replicaPort;
+    }
+
+    public void startHandshake() throws IOException {
+        sendPing();
+        if (receiveResponse().equals("+PONG")) {
+            sendReplconfListeningPort();
+            if (receiveResponse().equals("+OK")) {
+                sendReplconfCapaPsync2();
+                if (receiveResponse().equals("+OK")) {
+                    System.out.println("Handshake part 2 complete.");
+                } else {
+                    System.out.println("Failed on REPLCONF capa psync2");
+                }
+            } else {
+                System.out.println("Failed on REPLCONF listening-port");
+            }
+        } else {
+            System.out.println("Failed on PING");
+        }
+    }
+
+    private void sendPing() throws IOException {
+        String pingMessage = "*1\r\n$4\r\nPING\r\n";
+        outputStream.write(pingMessage.getBytes());
+        outputStream.flush();
+        System.out.println("PING sent to master");
+    }
+
+    private void sendReplconfListeningPort() throws IOException {
+        String replconfListeningPortMessage = "*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n" + replicaPort + "\r\n";
+        outputStream.write(replconfListeningPortMessage.getBytes());
+        outputStream.flush();
+        System.out.println("REPLCONF listening-port " + replicaPort + " sent to master");
+    }
+
+    private void sendReplconfCapaPsync2() throws IOException {
+        String replconfCapaPsync2Message = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
+        outputStream.write(replconfCapaPsync2Message.getBytes());
+        outputStream.flush();
+        System.out.println("REPLCONF capa psync2 sent to master");
+    }
+
+    private String receiveResponse() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String response = reader.readLine();
+        System.out.println("Response from master: " + response);
+        return response;
+    }
+}
+
