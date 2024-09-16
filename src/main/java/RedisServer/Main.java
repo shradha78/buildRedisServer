@@ -32,11 +32,11 @@ public class Main {
 
         int port = 6379;
 
-        listenToPort(clientSocket, port,args);
+        listenToPort(clientSocket, port);
 
     }
 
-    private static void listenToPort(Socket clientSocket, int port, String[] args) {
+    private static void listenToPort(Socket clientSocket, int port) {
 
         ServerSocket serverSocket;
 
@@ -45,8 +45,7 @@ public class Main {
         redisProtocolParser = new RedisProtocolParser();
 
         try {
-            //handling command line arguments
-            DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
+            System.out.println("Program is going to listen to port");
             port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
@@ -66,7 +65,7 @@ public class Main {
 
                         ClientSession session = new ClientSession();
 
-                        handlingClientCommands(finalClientSocket, session,args);
+                        handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -88,7 +87,7 @@ public class Main {
         }
     }
 
-    private static void handlingClientCommands(Socket clientSocket, ClientSession session, String[] args) throws IOException {
+    private static void handlingClientCommands(Socket clientSocket, ClientSession session) throws IOException {
 
         try {
             BufferedReader br = new BufferedReader(
@@ -103,8 +102,6 @@ public class Main {
 
            while (true) {
                 try {
-                    //handling command line arguments
-                    DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
                     System.out.println("Sending commands for parsing \n");
                     long currentTime = 0;
 

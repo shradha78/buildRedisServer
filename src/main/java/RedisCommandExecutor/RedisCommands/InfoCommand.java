@@ -16,13 +16,6 @@ public class InfoCommand implements IRedisCommandHandler{
         RedisReplication.RedisInstance redisInstance = new RedisInstance();
 
         if(infoArgument.equals("replication")) {
-            if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-              redisInstance.setRole("slave");
-            } else {
-                redisInstance.setRole("master");
-                redisInstance.setReplicationId("8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
-                redisInstance.setReplicationOffset("0");
-            }
             StringBuilder sb = new StringBuilder();
             sb.append("role:").append(redisInstance.getRole()).append("\n");
             sb.append("master_replid:").append(redisInstance.getReplicationId()).append("\n");

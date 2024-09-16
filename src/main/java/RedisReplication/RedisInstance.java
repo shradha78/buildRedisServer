@@ -1,34 +1,31 @@
 package RedisReplication;
 
 public class RedisInstance {
-    String role;
-    String replicationId;
-    String replicationOffset;
+    private static String role = "master";
+    private static String replicationId;
+    private static String replicationOffset;
 
-    public String getRole() {
+    public static String getRole() {
         return role;
     }
 
-    public RedisInstance setRole(String role) {
-        this.role = role;
-        return this;
+    public static void setRole(String role) {
+        RedisInstance.role = role;
     }
 
-    public String getReplicationId() {
+    public static String getReplicationId() {
         return replicationId;
     }
 
-    public RedisInstance setReplicationId(String replicationId) {
-        this.replicationId = replicationId;
-        return this;
+    public static void setReplicationId(String replicationId) {
+        RedisInstance.replicationId = replicationId;
     }
 
-    public String getReplicationOffset() {
+    public static String getReplicationOffset() {
         return replicationOffset;
     }
 
-    public RedisInstance setReplicationOffset(String replicationOffset) {
-        this.replicationOffset = replicationOffset;
-        return this;
+    public static void setReplicationOffset(String replicationOffset) {
+        RedisInstance.replicationOffset = replicationOffset;
     }
 }
