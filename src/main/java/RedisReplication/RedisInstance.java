@@ -2,8 +2,8 @@ package RedisReplication;
 
 public class RedisInstance {
     private static String role = "master";
-    private static String replicationId;
-    private static String replicationOffset;
+    private static String replicationId="8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
+    private static String replicationOffset="0";
 
     public static String getRole() {
         return role;
