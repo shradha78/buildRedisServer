@@ -3,6 +3,7 @@ package DataUtils;
 import RedisReplication.RedisInstance;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -46,21 +47,29 @@ public class ReplicationDataHandler {
         return isReplica;
     }
 
-    static void sendPingToMaster(String masterHost, int masterPort) {
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(masterHost, masterPort), 5000); // 5 second timeout
-            OutputStream out = socket.getOutputStream();
-            try {
-                out.write("*1\r\n$4\r\nping\r\n".getBytes(StandardCharsets.UTF_8));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public static void sendPingToMaster(String masterHost, int masterPort) {
+        try (Socket socket = new Socket(masterHost, masterPort);
+             OutputStream outputStream = socket.getOutputStream();
+             InputStream inputStream = socket.getInputStream()) {
+
+            // Send PING command in RESP format
+            String pingCommand = "*1\r\n$4\r\nPING\r\n";
+            outputStream.write(pingCommand.getBytes());
+            System.out.println("PING sent to master at " + masterHost + ":" + masterPort);
+
+            // Read the PONG response from the master (optional, depending on handshake logic)
+            byte[] buffer = new byte[1024];
+            int bytesRead = inputStream.read(buffer);
+            String response = new String(buffer, 0, bytesRead);
+            System.out.println("Response from master: " + response);
+
+            // Ensure that the PING is sent as part of the initial connection and does not interfere with future commands
+            if (response.startsWith("+PONG")) {
+                System.out.println("Master responded with PONG. Handshake part 1 complete.");
             }
-            out.flush();
-            System.out.println("PING sent to " + masterHost + ":" + masterPort);
+
         } catch (IOException e) {
-            System.err.println("Failed to send PING to " + masterHost + ":" +
-                    masterPort);
-            e.printStackTrace();
+            System.err.println("Failed to send PING to master: " + e.getMessage());
         }
     }
 }
