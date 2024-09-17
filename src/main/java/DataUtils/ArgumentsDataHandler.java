@@ -31,12 +31,14 @@ public class ArgumentsDataHandler {
                                                                         ReplicationDataHandler.getMaster_port(),
                                                                         ReplicationDataHandler.getPortToConnect()
                                                                         );
-                    try {
-                        slaveServer.connectToMaster();
-                    } catch (IOException e) {
-                        System.out.println("Failed to connect with Master");
-                        throw new RuntimeException(e);
-                    }
+                    new Thread(() -> {
+                        try {
+                            slaveServer.connectToMaster();
+                        } catch (IOException e) {
+                            System.out.println("Failed to connect with Master");
+                            e.printStackTrace();
+                        }
+                    }).start();
                 }
             }
         }
