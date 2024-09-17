@@ -44,6 +44,7 @@ public class Main {
                                 DataUtils.ReplicationDataHandler.getPortToConnect()
                         );
             new Thread(()->{
+                System.out.println("Replica thread: " + Thread.currentThread().getName());
             redisSlaveServer.initializeSlaveServer(redisSlaveServer);
             }).start();
         }
@@ -83,7 +84,7 @@ public class Main {
 
                 new Thread(() -> {
                     try {
-
+                        System.out.println("Client thread: " + Thread.currentThread().getName());
                         System.out.println("Connected with Client : " + finalClientSocket.getPort() );
                         System.out.println("Is client a slave : " + finalIsReplica);
 
@@ -103,6 +104,7 @@ public class Main {
         } finally {
             try {
                 if (clientSocket != null) {
+                    System.out.println("Closing client socket");
                     clientSocket.close();
                 }
             } catch (IOException e) {

@@ -28,9 +28,18 @@ public class RedisSlaveServer {
 
     public void connectToMaster() throws IOException {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
-        try (Socket masterSocket = new Socket(masterHost, masterPort)) {
+        try {
+            Socket masterSocket = new Socket(masterHost, masterPort);
             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
-            handshake.startHandshake();
+            try {
+                handshake.startHandshake();
+            }catch (IOException e){
+                e.printStackTrace();
+                System.out.println("Failed to start handshake.");
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to connect to master at " + masterHost + ":" + masterPort);
+            throw new RuntimeException(e);
         }
     }
 
