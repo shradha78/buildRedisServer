@@ -26,7 +26,7 @@ public class SETCommand implements IRedisCommandHandler{
 
         String respArray = "";
         respArray += "*3\r\n$3\r\nSET\r\n"+ "$" + setKey.length() + "\r\n" + setKey + "\r\n" + "$" + setValue.length() + "\r\n" + setValue + "\r\n";
-        MasterWriteCommands.addWriteCommands(respArray);
+        MasterWriteCommands.addWriteCommand(respArray);
 
 
         System.out.println("Key to set : " + setKey);
