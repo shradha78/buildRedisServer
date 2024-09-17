@@ -24,7 +24,7 @@ public class ReplicaManager {
             try {
                 OutputStream replicaStream = clientSession.getOutputStream();
                 replicaStream.write(command.getBytes());
-                replicaStream.flush();
+                //replicaStream.flush();
             } catch (IOException e) {
                 System.out.println("Error propagating command to replica: " + e.getMessage());
                 // You might want to remove the replica if there are issues
