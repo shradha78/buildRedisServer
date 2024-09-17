@@ -12,7 +12,7 @@ public class KeyValuePairData {
         return keyValueStore;
     }
 
-    public static void addKeyValueData(String key, KeyValue keyValue) {
+    public static synchronized void addKeyValueData(String key, KeyValue keyValue) {
         keyValueStore.put(key, keyValue);
     }
 
@@ -20,7 +20,7 @@ public class KeyValuePairData {
         return keyValueStore.get(key).getValue();
     }
 
-    public static KeyValue getSpecificKeyDetails(String key){
+    public static synchronized KeyValue getSpecificKeyDetails(String key){
         return keyValueStore.get(key);
     }
 
