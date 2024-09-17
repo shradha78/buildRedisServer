@@ -37,17 +37,6 @@ public class Main {
         //handling command line arguments
         DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
 
-        if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-            RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
-                                DataUtils.ReplicationDataHandler.getMaster_host(),
-                                DataUtils.ReplicationDataHandler.getMaster_port(),
-                                DataUtils.ReplicationDataHandler.getPortToConnect()
-                        );
-            System.out.println("Replica thread: " + Thread.currentThread().getName());
-            redisSlaveServer.initializeSlaveServer(redisSlaveServer);
-
-        }
-
         Socket clientSocket = null;
 
         int port = 6379;
@@ -88,6 +77,18 @@ public class Main {
                         System.out.println("Is client a slave : " + finalIsReplica);
 
                         ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
+
+                        if (DataUtils.ReplicationDataHandler.isIsReplica()) {
+                            RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
+                                    DataUtils.ReplicationDataHandler.getMaster_host(),
+                                    DataUtils.ReplicationDataHandler.getMaster_port(),
+                                    DataUtils.ReplicationDataHandler.getPortToConnect()
+                            );
+                            System.out.println("Replica thread: " + Thread.currentThread().getName());
+                            redisSlaveServer.initializeSlaveServer(redisSlaveServer);
+
+                        }
+
 
                         handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
