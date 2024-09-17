@@ -141,16 +141,23 @@ public class Main {
     }
 
     public static void processCommand(RedisCommand command, OutputStream outputStream, ClientSession session) throws IOException {
-
+        System.out.println("Processing command: " + command.getCommand());
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
 
 //        System.out.printf("Checking value for redis command handler %s\n", redisCommandHandler != null ? redisCommandHandler.getClass().getName() : "null");
 
         if (redisCommandHandler != null) {
-            System.out.println("***** Control is here, processing command");
-            redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
+            if (session.isReplica()) {
+                // For replica: execute command and update internal state, no response needed
+                redisCommandHandler.execute(command.getListOfCommandArguments(), null, session);
+            } else {
+                // For clients: execute command and send response
+                redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
+            }
         } else {
-            sendErrorResponse(outputStream, " Unknown Command");
+            if (!session.isReplica()) {
+                sendErrorResponse(outputStream, " Unknown Command");
+            }
         }
 
     }
