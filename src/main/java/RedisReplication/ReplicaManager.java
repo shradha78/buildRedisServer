@@ -10,17 +10,18 @@ import java.util.Set;
 import java.util.*;
 
 public class ReplicaManager {
-    private static List<OutputStream> replicaStreams = Collections.synchronizedList(new ArrayList<>());
+    private static List<ClientSession> replicaSession = Collections.synchronizedList(new ArrayList<>());
 
     // Add a new replica to the list
-    public static synchronized void addReplica(OutputStream outputStream) {
-        replicaStreams.add(outputStream);
+    public static synchronized void addReplica(ClientSession clientSession) {
+        replicaSession.add(clientSession);
     }
 
     // Propagate command to all connected replicas
     public static synchronized void propagateToAllReplicas(String command) {
-        for (OutputStream replicaStream : replicaStreams) {
+        for (ClientSession clientSession : replicaSession) {
             try {
+                OutputStream replicaStream = clientSession.getOutputStream();
                 replicaStream.write(command.getBytes());
                 replicaStream.flush();
             } catch (IOException e) {

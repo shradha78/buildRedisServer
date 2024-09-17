@@ -19,6 +19,10 @@ public class ClientSession {
         this.commandQueue = new LinkedList<>();
     }
 
+    public OutputStream getOutputStream() {
+        return outputStream;
+    }
+
     // Method to send commands to this replica
     public void sendCommand(String command) throws IOException {
         outputStream.write(command.getBytes());
