@@ -32,7 +32,7 @@ public class PSYNCCommand implements IRedisCommandHandler{
 
         System.out.println("Adding current session to replicas list");
         //session.setReplica(true);
-        ReplicaManager.addReplica(outputStream);
+        ReplicaManager.addReplica(session);
 
         System.out.println("Added current session to replicas list");
 

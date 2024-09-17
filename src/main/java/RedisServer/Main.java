@@ -64,6 +64,7 @@ public class Main {
                     try {
 
                         System.out.println("Connected with Client : " + finalClientSocket.getPort() );
+                        System.out.println("Is client a slave : " + finalIsReplica);
 
                         ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
 

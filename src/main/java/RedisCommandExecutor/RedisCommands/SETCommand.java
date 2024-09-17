@@ -41,7 +41,7 @@ public class SETCommand implements IRedisCommandHandler{
         }
 
         DataUtils.KeyValuePairData.addKeyValueData(setKey,new KeyValue(setKey,setValue, expiryTime));
-
+        System.out.println("Is client a slave ? " + session.isReplica());
         if(!session.isReplica()) {
             sendSimpleOKResponse(outputStream);
         }
