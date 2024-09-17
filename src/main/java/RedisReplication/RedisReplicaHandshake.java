@@ -1,5 +1,7 @@
 package RedisReplication;
 
+import RedisServer.ClientSession;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -26,6 +28,8 @@ public class RedisReplicaHandshake {
                     sendPsync();
                     // Ignoring response for now as instructed
                     receiveResponse(); // Expect +FULLRESYNC <REPL_ID> 0
+
+                    new Thread((Runnable) new ClientSession(masterSocket,true)).start();
                 } else {
                     System.out.println("Failed on REPLCONF capa psync2");
                 }
@@ -58,7 +62,7 @@ public class RedisReplicaHandshake {
         System.out.println("REPLCONF capa psync2 sent to master");
     }
 
-    private void sendPsync() throws IOException {
+    private void  sendPsync() throws IOException {
         String psyncMessage = "*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n";
         outputStream.write(psyncMessage.getBytes());
         outputStream.flush();
