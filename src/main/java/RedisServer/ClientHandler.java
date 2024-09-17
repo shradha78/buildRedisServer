@@ -30,6 +30,7 @@ public class ClientHandler implements Runnable {
     void handlingClientCommands(ClientSession session) throws IOException {
 
         try {
+            System.out.println("Handling commands, checking socket details : " + socket.getInetAddress() + ":" + socket.getPort());
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
 
