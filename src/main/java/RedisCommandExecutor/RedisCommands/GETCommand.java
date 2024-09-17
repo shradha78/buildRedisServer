@@ -36,7 +36,7 @@ public class GETCommand implements IRedisCommandHandler{
 
 
         KeyValue keyValue = DataUtils.KeyValuePairData.getSpecificKeyDetails(key);
-        System.out.println("In GET command is session, a replica?");
+        System.out.println("In GET command is session, a replica? "+session.isReplica());
             if (keyValue == null || keyValue.isExpired()) {
                 KeyValuePairData.removeKeyValueData(key);
 

@@ -166,12 +166,14 @@ public class Main {
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
 
 //        System.out.printf("Checking value for redis command handler %s\n", redisCommandHandler != null ? redisCommandHandler.getClass().getName() : "null");
-
+        System.out.println("Is session a replica in processing ? " + session.isReplica());
         if (redisCommandHandler != null) {
             if (session.isReplica()) {
+                System.out.println("Session is a replica");
                 // For replica: execute command and update internal state, no response needed
                 redisCommandHandler.execute(command.getListOfCommandArguments(), null, session);
             } else {
+                System.out.println("Master session");
                 // For clients: execute command and send response
                 redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
             }
