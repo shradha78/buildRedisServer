@@ -21,12 +21,12 @@ import static DataUtils.CommandsQueue.queueCommands;
 
 import static RedisResponses.ShortParsedResponses.sendErrorResponse;
 
+
 public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
 
     public static CountDownLatch latch = new CountDownLatch(1);
-    public static RedisSlaveServer slaveServer;
 
 
 
@@ -38,7 +38,12 @@ public class Main {
         DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
 
         if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-            initializeSlaveServer();
+            RedisSlaveServer slaveServer = new RedisSlaveServer(
+                                DataUtils.ReplicationDataHandler.getMaster_host(),
+                                DataUtils.ReplicationDataHandler.getMaster_port(),
+                                DataUtils.ReplicationDataHandler.getPortToConnect()
+                        );
+            slaveServer.initializeSlaveServer(slaveServer);
         }
         try {
             if (!latch.await(10, TimeUnit.SECONDS)) { // Adjust timeout as needed
@@ -55,25 +60,6 @@ public class Main {
 
         listenToPort(clientSocket, port);
 
-    }
-
-    private static void initializeSlaveServer() {
-        slaveServer = new RedisSlaveServer(
-                DataUtils.ReplicationDataHandler.getMaster_host(),
-                DataUtils.ReplicationDataHandler.getMaster_port(),
-                DataUtils.ReplicationDataHandler.getPortToConnect()
-        );
-        System.out.println("Slave server details : " + slaveServer.getMasterHost() + " " + slaveServer.getMasterPort() + " " + slaveServer.getReplicaPort());
-        new Thread(() -> {
-            try {
-                slaveServer.connectToMaster();
-                latch.countDown(); // Signal that setup is complete
-            } catch (IOException e) {
-                System.out.println("Failed to connect with Master");
-                e.printStackTrace();
-                latch.countDown(); // Ensure latch is counted down even on failure
-            }
-        }).start();
     }
 
 
