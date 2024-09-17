@@ -30,7 +30,15 @@ public class RedisReplicaHandshake {
                     // Ignoring response for now as instructed
                     receiveResponse();// Expect +FULLRESYNC <REPL_ID> 0
                     System.out.println("After Psync, receiving response " + receiveResponse());
-                    //new Thread(new ClientSession(masterSocket,true)).start();
+                    new Thread(() -> {
+                        try {
+                            System.out.println("Starting ClientHandler thread.");
+                            System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
+                            new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
                 } else {
                     System.out.println("Failed on REPLCONF capa psync2");
                 }
@@ -40,15 +48,6 @@ public class RedisReplicaHandshake {
         } else {
             System.out.println("Failed on PING");
         }
-        new Thread(() -> {
-            try {
-                System.out.println("Starting ClientHandler thread.");
-                System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
-                new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).start();
     }
 
     private void sendPing() throws IOException {
