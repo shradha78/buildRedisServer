@@ -20,6 +20,7 @@ public class MasterWriteCommands {
 
     // Get the list of commands (if needed for manual processing)
     public static synchronized List<String> getWriteCommands() {
+        System.out.println("Getting write commands from a list");
         return new ArrayList<>(writeCommands);
     }
 
