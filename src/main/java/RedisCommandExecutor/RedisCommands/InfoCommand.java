@@ -12,17 +12,13 @@ public class InfoCommand implements IRedisCommandHandler{
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("INFO Command");
         String infoArgument = args.get(0);
-        RedisServerConfig redisServerConfig = new RedisServerConfig();
+        RedisServerConfig redisServerConfig = RedisServerConfig.getInstance();
 
         if(infoArgument.equals("replication")) {
             if (DataUtils.ReplicationDataHandler.isIsReplica()) {
               redisServerConfig.setRole("slave");
               redisServerConfig.setReplicationId("");
               redisServerConfig.setReplicationOffset("");
-            } else {
-                redisServerConfig.setRole("master");
-                redisServerConfig.setReplicationId("8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
-                redisServerConfig.setReplicationOffset("0");
             }
             StringBuilder sb = new StringBuilder();
             sb.append("role:").append(redisServerConfig.getRole()).append("\n");

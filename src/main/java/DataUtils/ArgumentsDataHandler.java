@@ -21,7 +21,6 @@ public class ArgumentsDataHandler {
             }
             if (args[i].equals("--replicaof")) {
                 ReplicationDataHandler.setIsReplica(true);
-                RedisServerConfig.setRole("slave");
                 String replicaInfo = args[++i];
                 String[] parts = replicaInfo.split(" ");
                 if (parts.length == 2) {

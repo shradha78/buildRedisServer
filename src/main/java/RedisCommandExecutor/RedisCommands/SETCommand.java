@@ -1,5 +1,6 @@
 package RedisCommandExecutor.RedisCommands;
 
+import DataUtils.MasterWriteCommands;
 import RedisServer.ClientSession;
 import DataUtils.KeyValue;
 
@@ -22,6 +23,11 @@ public class SETCommand implements IRedisCommandHandler{
         String setKey = args.get(0);
 
         String setValue = args.get(1);
+
+        String respArray = "";
+        respArray += "*3\r\n$3\r\nSET\r\n"+ "$" + setKey.length() + "\r\n" + setKey + "\r\n" + "$" + setValue.length() + "\r\n" + setValue + "\r\n";
+        MasterWriteCommands.addWriteCommands(respArray);
+
 
         System.out.println("Key to set : " + setKey);
         System.out.println("Value to set : " + setValue);
