@@ -6,11 +6,13 @@ import RedisCommandExecutor.RedisCommands.IRedisCommandHandler;
 import RedisCommandExecutor.RedisParser.RedisCommand;
 import RedisCommandExecutor.RedisParser.RedisCommandParser;
 import RedisCommandExecutor.RedisParser.RedisProtocolParser;
+import RedisReplication.RedisSlaveServer;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import static DataUtils.CommandsQueue.queueCommands;
 
@@ -20,6 +22,9 @@ public class Main {
     private static RedisCommandParser redisCommandParser;
     private static RedisProtocolParser redisProtocolParser;
 
+    public static CountDownLatch latch = new CountDownLatch(1);
+    public static RedisSlaveServer slaveServer;
+
 
     public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -28,6 +33,17 @@ public class Main {
         //handling command line arguments
         DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
 
+        if (DataUtils.ReplicationDataHandler.isIsReplica()) {
+            initializeSlaveServer();
+        }
+        try {
+            // Wait for replication setup to complete
+            latch.await();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted while waiting for replication setup");
+            e.printStackTrace();
+        }
+
         Socket clientSocket = null;
 
         int port = 6379;
@@ -35,6 +51,26 @@ public class Main {
         listenToPort(clientSocket, port);
 
     }
+
+    private static void initializeSlaveServer() {
+        slaveServer = new RedisSlaveServer(
+                DataUtils.ReplicationDataHandler.getMaster_host(),
+                DataUtils.ReplicationDataHandler.getMaster_port(),
+                DataUtils.ReplicationDataHandler.getPortToConnect()
+        );
+
+        new Thread(() -> {
+            try {
+                slaveServer.connectToMaster();
+                latch.countDown(); // Signal that setup is complete
+            } catch (IOException e) {
+                System.out.println("Failed to connect with Master");
+                e.printStackTrace();
+                latch.countDown(); // Ensure latch is counted down even on failure
+            }
+        }).start();
+    }
+
 
     private static void listenToPort(Socket clientSocket, int port) {
 
