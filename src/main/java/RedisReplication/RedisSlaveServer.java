@@ -1,5 +1,8 @@
 package RedisReplication;
 
+import RedisServer.ClientHandler;
+import RedisServer.ClientSession;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -7,6 +10,7 @@ public class RedisSlaveServer {
     private final String masterHost;
     private final int masterPort;
     private final int replicaPort;
+    Socket masterSocket;
 
     public RedisSlaveServer(String masterHost, int masterPort, int replicaPort) {
         this.masterHost = masterHost;
@@ -29,7 +33,7 @@ public class RedisSlaveServer {
     public void connectToMaster() throws IOException {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
         try {
-            Socket masterSocket = new Socket(masterHost, masterPort);
+             this.masterSocket = new Socket(masterHost, masterPort);
             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
 //            new Thread(() ->{
                 try {
@@ -53,6 +57,13 @@ public class RedisSlaveServer {
         System.out.println("Slave server details : " + slaveServer.getMasterHost() + " " + slaveServer.getMasterPort() + " " + slaveServer.getReplicaPort());
             try {
                 slaveServer.connectToMaster();
+                new Thread(() -> {
+                    try {
+                        new Thread(new ClientHandler((this.masterSocket),new ClientSession(this.masterSocket,true))).start();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
             } catch (IOException e) {
                 System.out.println("Failed to connect with Master");
                 e.printStackTrace();

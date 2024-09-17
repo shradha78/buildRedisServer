@@ -1,5 +1,6 @@
 package RedisCommandExecutor.RedisCommands;
 
+import RedisServer.ClientHandler;
 import RedisServer.ClientSession;
 import RedisCommandExecutor.RedisParser.RedisCommand;
 
@@ -40,7 +41,7 @@ public class ExecCommand implements IRedisCommandHandler {
             // Process each command and capture its response
             ByteArrayOutputStream commandOutputStream = new ByteArrayOutputStream();
 
-            RedisServer.Main.processCommand(redisCommand, commandOutputStream, session);
+            ClientHandler.processCommand(redisCommand, commandOutputStream, session);
 
             responses.add(commandOutputStream.toString("UTF-8")); // Capture the command response
 
