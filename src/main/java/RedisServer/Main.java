@@ -13,6 +13,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static DataUtils.CommandsQueue.queueCommands;
 
@@ -24,6 +27,8 @@ public class Main {
 
     public static CountDownLatch latch = new CountDownLatch(1);
     public static RedisSlaveServer slaveServer;
+
+    private static ExecutorService clientThreadPool = Executors.newFixedThreadPool(10);
 
 
     public static void main(String[] args) {
@@ -37,8 +42,9 @@ public class Main {
             initializeSlaveServer();
         }
         try {
-            // Wait for replication setup to complete
-            latch.await();
+            if (!latch.await(10, TimeUnit.SECONDS)) { // Adjust timeout as needed
+                System.out.println("Timed out waiting for replication setup");
+            }
         } catch (InterruptedException e) {
             System.out.println("Interrupted while waiting for replication setup");
             e.printStackTrace();
@@ -96,19 +102,21 @@ public class Main {
                 final Socket finalClientSocket = clientSocket;
                 final boolean finalIsReplica = isReplica;
 
-                new Thread(() -> {
-                    try {
+               // new Thread(() -> {
+                clientThreadPool.submit(() -> {
+                            try {
 
-                        System.out.println("Connected with Client : " + finalClientSocket.getPort() );
-                        System.out.println("Is client a slave : " + finalIsReplica);
+                                System.out.println("Connected with Client : " + finalClientSocket.getPort());
+                                System.out.println("Is client a slave : " + finalIsReplica);
 
-                        ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
+                                ClientSession session = new ClientSession(finalClientSocket, finalIsReplica);
 
-                        handlingClientCommands(finalClientSocket, session);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+                                handlingClientCommands(finalClientSocket, session);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+//                }).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
