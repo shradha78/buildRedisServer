@@ -31,12 +31,16 @@ public class RedisSlaveServer {
         try {
             Socket masterSocket = new Socket(masterHost, masterPort);
             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
-            try {
-                handshake.startHandshake();
-            }catch (IOException e){
-                e.printStackTrace();
-                System.out.println("Failed to start handshake.");
-            }
+            new Thread(() ->{
+                try {
+                    System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
+                    handshake.startHandshake();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    System.out.println("Failed to start handshake.");
+                }
+            }).start();
+
         } catch (IOException e) {
             System.out.println("Failed to connect to master at " + masterHost + ":" + masterPort);
             throw new RuntimeException(e);

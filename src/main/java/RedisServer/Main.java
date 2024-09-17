@@ -43,10 +43,9 @@ public class Main {
                                 DataUtils.ReplicationDataHandler.getMaster_port(),
                                 DataUtils.ReplicationDataHandler.getPortToConnect()
                         );
-            new Thread(()->{
-                System.out.println("Replica thread: " + Thread.currentThread().getName());
+            System.out.println("Replica thread: " + Thread.currentThread().getName());
             redisSlaveServer.initializeSlaveServer(redisSlaveServer);
-            }).start();
+
         }
 
         Socket clientSocket = null;
