@@ -60,7 +60,7 @@ public class RedisReplicaHandshake {
     private void sendPsync() throws IOException {
         long length = RedisServerConfig.getReplicationId().length();
         String replIdLength = "$" + length;
-        String psyncMessage = "*3\r\n$11\r\n+FULLRESYNC\r\n" + replIdLength + "\r\n"+ RedisServerConfig.getReplicationId() + "\r\n"
+        String psyncMessage = "*3\r\n$5\r\nPSYNC\r\n" + replIdLength + "\r\n"+ RedisServerConfig.getReplicationId() + "\r\n"
                                             +"$1\r\n" + RedisServerConfig.getReplicationOffset() + "\r\n";
         outputStream.write(psyncMessage.getBytes());
         outputStream.flush();
