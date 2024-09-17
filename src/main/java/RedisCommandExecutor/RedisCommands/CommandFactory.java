@@ -24,6 +24,7 @@ public class CommandFactory {
         commands.put("KEYS", new KeysCommand());
         commands.put("INFO", new InfoCommand());
         commands.put("REPLCONF", new ReplconfCommand());
+        commands.put("PSYNC", new PSYNCCommand());
 
     }
 
