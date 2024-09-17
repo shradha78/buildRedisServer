@@ -38,20 +38,12 @@ public class Main {
         DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
 
         if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-            RedisSlaveServer slaveServer = new RedisSlaveServer(
+            RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
                                 DataUtils.ReplicationDataHandler.getMaster_host(),
                                 DataUtils.ReplicationDataHandler.getMaster_port(),
                                 DataUtils.ReplicationDataHandler.getPortToConnect()
                         );
-            slaveServer.initializeSlaveServer(slaveServer);
-        }
-        try {
-            if (!latch.await(10, TimeUnit.SECONDS)) { // Adjust timeout as needed
-                System.out.println("Timed out waiting for replication setup");
-            }
-        } catch (InterruptedException e) {
-            System.out.println("Interrupted while waiting for replication setup");
-            e.printStackTrace();
+            redisSlaveServer.initializeSlaveServer(redisSlaveServer);
         }
 
         Socket clientSocket = null;
