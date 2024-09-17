@@ -132,6 +132,7 @@ public class Main {
         } finally {
             try {
                 if (clientSocket != null && !clientSocket.isClosed()) {
+                    System.out.println("Closing client socket.");
                     clientSocket.close();
                 }
             } catch (IOException e) {
