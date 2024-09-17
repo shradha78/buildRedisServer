@@ -57,7 +57,15 @@ public class RedisSlaveServer {
         System.out.println("Slave server details : " + slaveServer.getMasterHost() + " " + slaveServer.getMasterPort() + " " + slaveServer.getReplicaPort());
             try {
                 slaveServer.connectToMaster();
-
+                new Thread(() -> {
+                    try {
+                        System.out.println("Starting ClientHandler thread.");
+                        System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
+                        new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
                 System.out.println("Replica server is fully initialized and listening on port " + replicaPort);
             } catch (IOException e) {
                 System.out.println("Failed to connect with Master");

@@ -33,7 +33,7 @@ public class Main {
         Socket clientSocket = null;
 
         int port = 6379;
-
+        port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
         listenToPort(clientSocket, port);
 
     }
@@ -43,7 +43,6 @@ public class Main {
 
         ServerSocket serverSocket;
         try {
-            port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
             System.out.println("Listening on port " + port);
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR

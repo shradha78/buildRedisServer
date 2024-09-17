@@ -27,16 +27,6 @@ public class RedisReplicaHandshake {
                 sendReplconfCapaPsync2();
                 if (receiveResponse().equals("+OK")) {
                     sendPsync();
-                    new Thread(() -> {
-                        try {
-                            System.out.println("Starting ClientHandler thread.");
-                            System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
-                            Socket replicaSocket = new Socket("localhost",replicaPort);
-                            new Thread(new ClientHandler(replicaSocket,new ClientSession(replicaSocket,true))).start();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).start();
                     // Ignoring response for now as instructed
                     receiveResponse();// Expect +FULLRESYNC <REPL_ID> 0
                     System.out.println("After Psync, receiving response " + receiveResponse());

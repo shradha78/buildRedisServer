@@ -29,13 +29,8 @@ public class ClientHandler implements Runnable {
 
     void handlingClientCommands(ClientSession session) throws IOException {
 
-        try {
-            System.out.println("Handling commands, checking socket details : " + socket.getInetAddress() + ":" + socket.getPort());
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
-
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             this.outputStream = socket.getOutputStream();
-
             PrintWriter printWriter = new PrintWriter(outputStream, true);
 
            while (true) {
