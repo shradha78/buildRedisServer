@@ -23,6 +23,8 @@ public class ClientHandler implements Runnable {
     public ClientHandler(Socket socket,ClientSession clientSession) {
         this.socket = socket;
         this.clientSession = clientSession;
+        redisCommandParser = new RedisCommandParser();
+        redisProtocolParser = new RedisProtocolParser();
     }
 
     void handlingClientCommands(ClientSession session) throws IOException {
