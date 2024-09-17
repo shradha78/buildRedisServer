@@ -31,7 +31,8 @@ public class RedisReplicaHandshake {
                         try {
                             System.out.println("Starting ClientHandler thread.");
                             System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
-                            new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
+                            Socket replicaSocket = new Socket(masterSocket.getInetAddress() ,replicaPort);
+                            new Thread(new ClientHandler(replicaSocket,new ClientSession(replicaSocket,true))).start();
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
