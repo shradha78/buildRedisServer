@@ -58,7 +58,7 @@ public class Main {
                 DataUtils.ReplicationDataHandler.getMaster_port(),
                 DataUtils.ReplicationDataHandler.getPortToConnect()
         );
-
+        System.out.println("Slave server details : " + slaveServer.getMasterHost() + " " + slaveServer.getMasterPort() + " " + slaveServer.getReplicaPort());
         new Thread(() -> {
             try {
                 slaveServer.connectToMaster();

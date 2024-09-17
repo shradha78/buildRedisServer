@@ -14,7 +14,19 @@ public class RedisSlaveServer {
             this.replicaPort = replicaPort;
         }
 
-        public void connectToMaster() throws IOException {
+    public String getMasterHost() {
+        return masterHost;
+    }
+
+    public int getMasterPort() {
+        return masterPort;
+    }
+
+    public int getReplicaPort() {
+        return replicaPort;
+    }
+
+    public void connectToMaster() throws IOException {
             System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
             try (Socket masterSocket = new Socket(masterHost, masterPort)) {
                 RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
