@@ -39,16 +39,9 @@ public class GETCommand implements IRedisCommandHandler{
         System.out.println("In GET command is session, a replica? "+session.isReplica());
             if (keyValue == null || keyValue.isExpired()) {
                 KeyValuePairData.removeKeyValueData(key);
-
-                if(!session.isReplica()) {
-                    sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");
-                }
+                sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");
             } else {
-                if(!session.isReplica()) {
-                    sendBulkStringResponse(outputStream, keyValue.getValue(), "Response for GET ");
-                }
-
-
-        }
+                sendBulkStringResponse(outputStream, keyValue.getValue(), "Response for GET ");
+            }
     }
 }
