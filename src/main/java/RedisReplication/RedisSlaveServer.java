@@ -34,7 +34,7 @@ public class RedisSlaveServer {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
         try {
              this.masterSocket = new Socket(masterHost, masterPort);
-            RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
+             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
 //            new Thread(() ->{
                 try {
                     System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
@@ -59,11 +59,14 @@ public class RedisSlaveServer {
                 slaveServer.connectToMaster();
                 new Thread(() -> {
                     try {
-                        new Thread(new ClientHandler((this.masterSocket),new ClientSession(this.masterSocket,true))).start();
+                        System.out.println("Starting ClientHandler thread.");
+                        new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }).start();
+
+                System.out.println("Replica server is fully initialized and listening on port " + replicaPort);
             } catch (IOException e) {
                 System.out.println("Failed to connect with Master");
                 e.printStackTrace();

@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here!");
-        args = new String[]{"--port", "6380", "--replicaof", "localhost 6379"};
+       // args = new String[]{"--port", "6380", "--replicaof", "localhost 6379"};
         //handling command line arguments
         DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
 
@@ -43,7 +43,6 @@ public class Main {
 
         ServerSocket serverSocket;
         try {
-
             port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
             System.out.println("Listening on port " + port);
             serverSocket = new ServerSocket(port);
