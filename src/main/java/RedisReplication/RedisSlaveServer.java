@@ -31,7 +31,7 @@ public class RedisSlaveServer {
         try {
             Socket masterSocket = new Socket(masterHost, masterPort);
             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
-            new Thread(() ->{
+//            new Thread(() ->{
                 try {
                     System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
                     handshake.startHandshake();
@@ -39,7 +39,7 @@ public class RedisSlaveServer {
                     e.printStackTrace();
                     System.out.println("Failed to start handshake.");
                 }
-            }).start();
+//            }).start();
 
         } catch (IOException e) {
             System.out.println("Failed to connect to master at " + masterHost + ":" + masterPort);
