@@ -43,29 +43,4 @@ public class ReplicationDataHandler {
         return isReplica;
     }
 
-    public static void sendPingToMaster(String masterHost, int masterPort) {
-        try (Socket socket = new Socket(masterHost, masterPort);
-             OutputStream outputStream = socket.getOutputStream();
-             InputStream inputStream = socket.getInputStream()) {
-
-            // Send PING command in RESP format
-            String pingCommand = "*1\r\n$4\r\nPING\r\n";
-            outputStream.write(pingCommand.getBytes());
-            System.out.println("PING sent to master at " + masterHost + ":" + masterPort);
-
-            // Read the PONG response from the master (optional, depending on handshake logic)
-            byte[] buffer = new byte[1024];
-            int bytesRead = inputStream.read(buffer);
-            String response = new String(buffer, 0, bytesRead);
-            System.out.println("Response from master: " + response);
-
-            // Ensure that the PING is sent as part of the initial connection and does not interfere with future commands
-            if (response.startsWith("+PONG")) {
-                System.out.println("Master responded with PONG. Handshake part 1 complete.");
-            }
-
-        } catch (IOException e) {
-            System.err.println("Failed to send PING to master: " + e.getMessage());
-        }
-    }
 }

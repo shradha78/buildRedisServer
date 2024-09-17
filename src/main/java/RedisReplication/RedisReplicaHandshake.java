@@ -24,6 +24,7 @@ public class RedisReplicaHandshake {
                 sendReplconfCapaPsync2();
                 if (receiveResponse().equals("+OK")) {
                     System.out.println("Handshake part 2 complete.");
+                    sendPsync();
                 } else {
                     System.out.println("Failed on REPLCONF capa psync2");
                 }
@@ -54,6 +55,16 @@ public class RedisReplicaHandshake {
         outputStream.write(replconfCapaPsync2Message.getBytes());
         outputStream.flush();
         System.out.println("REPLCONF capa psync2 sent to master");
+    }
+
+    private void sendPsync() throws IOException {
+        long length = RedisServerConfig.getReplicationId().length();
+        String replIdLength = "$" + length;
+        String psyncMessage = "*3\r\n$11\r\n+FULLRESYNC\r\n" + replIdLength + "\r\n"+ RedisServerConfig.getReplicationId() + "\r\n"
+                                            +"$1\r\n" + RedisServerConfig.getReplicationOffset() + "\r\n";
+        outputStream.write(psyncMessage.getBytes());
+        outputStream.flush();
+        System.out.println("PSYNC sent to master");
     }
 
     private String receiveResponse() throws IOException {
