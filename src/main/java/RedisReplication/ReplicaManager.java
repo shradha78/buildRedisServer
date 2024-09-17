@@ -20,15 +20,17 @@ public class ReplicaManager {
 
     // Propagate command to all connected replicas
     public static synchronized void propagateToAllReplicas(String command) {
+        System.out.println("Propogating to all replicas : " + command);
         for (ClientSession clientSession : replicaSession) {
             try {
                 OutputStream replicaStream = clientSession.getOutputStream();
                 replicaStream.write(command.getBytes());
-                //replicaStream.flush();
+                replicaStream.flush();
             } catch (IOException e) {
                 System.out.println("Error propagating command to replica: " + e.getMessage());
                 // You might want to remove the replica if there are issues
             }
         }
+        System.out.println("All replicas propagated");
     }
 }

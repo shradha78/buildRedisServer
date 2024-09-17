@@ -13,6 +13,7 @@ public class MasterWriteCommands {
 
     // Add a write command to the list and propagate
     public static synchronized void addWriteCommand(String command) {
+        System.out.println("Adding write commands to a list and propogating to to the replicas");
         writeCommands.add(command);
         ReplicaManager.propagateToAllReplicas(command); // propagate to all replicas as soon as it's added
     }
