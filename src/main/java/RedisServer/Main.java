@@ -28,7 +28,6 @@ public class Main {
     public static CountDownLatch latch = new CountDownLatch(1);
     public static RedisSlaveServer slaveServer;
 
-    private static ExecutorService clientThreadPool = Executors.newFixedThreadPool(10);
 
 
     public static void main(String[] args) {
@@ -102,21 +101,19 @@ public class Main {
                 final Socket finalClientSocket = clientSocket;
                 final boolean finalIsReplica = isReplica;
 
-               // new Thread(() -> {
-                clientThreadPool.submit(() -> {
-                            try {
+                new Thread(() -> {
+                    try {
 
-                                System.out.println("Connected with Client : " + finalClientSocket.getPort());
-                                System.out.println("Is client a slave : " + finalIsReplica);
+                        System.out.println("Connected with Client : " + finalClientSocket.getPort() );
+                        System.out.println("Is client a slave : " + finalIsReplica);
 
-                                ClientSession session = new ClientSession(finalClientSocket, finalIsReplica);
+                        ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
 
-                                handlingClientCommands(finalClientSocket, session);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-//                }).start();
+                        handlingClientCommands(finalClientSocket, session);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -148,21 +145,22 @@ public class Main {
                 try {
                     long currentTime = 0;
 
+                    while (br.ready()) {
+                        //parsing input from the client
+                        List<String> parsedInput = redisProtocolParser.parseRESPMessage(br, currentTime);
 
-                    //parsing input from the client
-                    List<String> parsedInput = redisProtocolParser.parseRESPMessage(br,currentTime);
+                        //After parsing the input from client, separating command and its arguments
+                        RedisCommand command = redisCommandParser.parseCommand(parsedInput, currentTime);
 
-                    //After parsing the input from client, separating command and its arguments
-                    RedisCommand command = redisCommandParser.parseCommand(parsedInput, currentTime);
+                        //maintaining queue of commands, specifically for MULTI and EXEC Command
+                        queueCommands(command, session);
 
-                    //maintaining queue of commands, specifically for MULTI and EXEC Command
-                    queueCommands(command, session);
-
-                    try {
-                        processCommand(command, outputStream, session);//based on commands, it will process output
-                    } catch (IOException e) {
-                        System.out.println("Error while processing command: " + e.getMessage());
-                        break;
+                        try {
+                            processCommand(command, outputStream, session);//based on commands, it will process output
+                        } catch (IOException e) {
+                            System.out.println("Error while processing command: " + e.getMessage());
+                            break;
+                        }
                     }
 
                 } catch (IOException e) {
