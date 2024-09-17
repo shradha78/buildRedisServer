@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 
 public class PSYNCCommand implements IRedisCommandHandler{
-    private static List<BlockingQueue<String>> queues = new ArrayList<>();
+    public static List<BlockingQueue<String>> queues = new ArrayList<>();
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("Received Psync command from replica");

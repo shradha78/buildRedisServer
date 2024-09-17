@@ -7,7 +7,9 @@ import DataUtils.KeyValue;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
+import static RedisCommandExecutor.RedisCommands.PSYNCCommand.queues;
 import static RedisResponses.ShortParsedResponses.sendSimpleOKResponse;
 
 
@@ -26,7 +28,14 @@ public class SETCommand implements IRedisCommandHandler{
 
         String respArray = "";
         respArray += "*3\r\n$3\r\nSET\r\n"+ "$" + setKey.length() + "\r\n" + setKey + "\r\n" + "$" + setValue.length() + "\r\n" + setValue + "\r\n";
-        MasterWriteCommands.addWriteCommand(respArray);
+//        MasterWriteCommands.addWriteCommand(respArray);
+        try {
+            for (BlockingQueue<String> queue : queues) {
+                queue.put(respArray);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
 
         System.out.println("Key to set : " + setKey);

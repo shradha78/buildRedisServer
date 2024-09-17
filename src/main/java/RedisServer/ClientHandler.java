@@ -102,7 +102,7 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("Running on Thread : "+ Thread.currentThread().getName());
+            System.out.println("Client Handler Running on Thread : "+ Thread.currentThread().getName());
             handlingClientCommands(clientSession);
         } catch (IOException e) {
             throw new RuntimeException(e);

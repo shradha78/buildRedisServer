@@ -1,14 +1,11 @@
 package RedisServer;
 
 import DataUtils.ReplicationDataHandler;
-import RedisCommandExecutor.RedisParser.RedisCommandParser;
-import RedisCommandExecutor.RedisParser.RedisProtocolParser;
-import RedisReplication.RedisSlaveServer;
+import RedisReplication.RedisReplicaServer;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.CountDownLatch;
 
 
 public class Main {
@@ -21,13 +18,13 @@ public class Main {
         DataUtils.ArgumentsDataHandler.handleTestArgumentsForConfigurations(args);
 
         if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-            RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
+            RedisReplicaServer redisReplicaServer = new RedisReplicaServer(
                     DataUtils.ReplicationDataHandler.getMaster_host(),
                     DataUtils.ReplicationDataHandler.getMaster_port(),
                     DataUtils.ReplicationDataHandler.getPortToConnect()
             );
             System.out.println("Replica thread: " + Thread.currentThread().getName());
-            redisSlaveServer.initializeSlaveServer(redisSlaveServer);
+            redisReplicaServer.initializeSlaveServer(redisReplicaServer);
         }
 
         Socket clientSocket = null;
