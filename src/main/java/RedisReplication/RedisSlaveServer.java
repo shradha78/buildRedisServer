@@ -38,13 +38,12 @@ public class RedisSlaveServer {
     public void initializeSlaveServer(RedisSlaveServer slaveServer) {
 
         System.out.println("Slave server details : " + slaveServer.getMasterHost() + " " + slaveServer.getMasterPort() + " " + slaveServer.getReplicaPort());
-        new Thread(() -> {
             try {
                 slaveServer.connectToMaster();
             } catch (IOException e) {
                 System.out.println("Failed to connect with Master");
                 e.printStackTrace();
             }
-        }).start();
-    }
+        }
+
 }
