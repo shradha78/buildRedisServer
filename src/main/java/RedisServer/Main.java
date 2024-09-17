@@ -55,8 +55,9 @@ public class Main {
         redisProtocolParser = new RedisProtocolParser();
 
         try {
-            port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
 
+            port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
+            System.out.println("Listening on port " + port);
             serverSocket = new ServerSocket(port);
             if (DataUtils.ReplicationDataHandler.isIsReplica()) {
                 RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
@@ -66,7 +67,6 @@ public class Main {
                 );
                 System.out.println("Replica thread: " + Thread.currentThread().getName());
                 redisSlaveServer.initializeSlaveServer(redisSlaveServer);
-
             }
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
