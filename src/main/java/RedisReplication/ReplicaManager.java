@@ -3,35 +3,29 @@ package RedisReplication;
 import RedisServer.ClientSession;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.*;
 
 public class ReplicaManager {
-    private static Set<ClientSession> replicas = new HashSet<>();
+    private static List<OutputStream> replicaStreams = Collections.synchronizedList(new ArrayList<>());
 
-    public static synchronized void addReplica(ClientSession session) {
-        replicas.add(session);
+    // Add a new replica to the list
+    public static synchronized void addReplica(OutputStream outputStream) {
+        replicaStreams.add(outputStream);
     }
 
-    // Remove replica if it disconnects
-    public static void removeReplica(ClientSession session) {
-        replicas.remove(session);
-    }
-
-    // Get all connected replicas
-    public static  Set<ClientSession> getConnectedReplicas() {
-        return new HashSet<>(replicas); // return a copy to avoid concurrent modifications
-    }
-
-    // Send a command to all replicas
-    public static void propagateToAllReplicas(String command) {
-        for (ClientSession replica : replicas) {
+    // Propagate command to all connected replicas
+    public static synchronized void propagateToAllReplicas(String command) {
+        for (OutputStream replicaStream : replicaStreams) {
             try {
-                replica.sendCommand(command);
+                replicaStream.write(command.getBytes());
+                replicaStream.flush();
             } catch (IOException e) {
-                System.err.println("Failed to send command to replica: " + replica);
-                // Optionally, remove the replica if it's disconnected
-                removeReplica(replica);
+                System.out.println("Error propagating command to replica: " + e.getMessage());
+                // You might want to remove the replica if there are issues
             }
         }
     }
