@@ -147,11 +147,7 @@ public class Main {
 
         if (redisCommandHandler != null) {
             System.out.println("***** Control is here, processing command");
-            if(session.isReplica()) {
-                redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
-            }else{
-                redisCommandHandler.execute(command.getListOfCommandArguments(), null, session);
-            }
+            redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
         }

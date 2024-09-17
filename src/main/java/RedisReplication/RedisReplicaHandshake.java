@@ -29,7 +29,7 @@ public class RedisReplicaHandshake {
                     // Ignoring response for now as instructed
                     receiveResponse(); // Expect +FULLRESYNC <REPL_ID> 0
 
-                    new Thread((Runnable) new ClientSession(masterSocket,true)).start();
+                    new Thread(new ClientSession(masterSocket,true)).start();
                 } else {
                     System.out.println("Failed on REPLCONF capa psync2");
                 }
