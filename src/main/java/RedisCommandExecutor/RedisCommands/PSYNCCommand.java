@@ -28,7 +28,9 @@ public class PSYNCCommand implements IRedisCommandHandler{
         try {
             while (true) {
                 String element = MasterWriteCommands.getWriteCommand();
-                outputStream.write(element.getBytes());
+                if (element != null) {
+                    outputStream.write(element.getBytes());
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
