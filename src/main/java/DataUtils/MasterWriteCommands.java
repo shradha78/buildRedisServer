@@ -18,8 +18,8 @@ public class MasterWriteCommands {
     }
     public static String getWriteCommand(){
         try {
-            return blockingQueue.take();
-        } catch (InterruptedException e) {
+            return blockingQueue.poll();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

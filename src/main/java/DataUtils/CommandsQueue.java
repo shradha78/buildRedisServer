@@ -20,7 +20,7 @@ public class CommandsQueue {
 
         queueOfCommandsForMultiAndExec.add(command);
 
-        System.out.printf("Queued command: %s\n", command.getCommand());
+//        System.out.printf("Queued command: %s\n", command.getCommand());
     }
 
 }

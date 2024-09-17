@@ -9,7 +9,7 @@ import java.util.List;
 public class PingCommand implements IRedisCommandHandler{
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
-        System.out.println("PingCommand*********");
+//        System.out.println("PingCommand*********");
         if(MultiCommandCheckerUtils.checkForMultiCommandInQueue(outputStream,session)){
             return;
         }

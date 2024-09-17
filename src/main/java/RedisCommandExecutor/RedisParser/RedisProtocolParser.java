@@ -9,14 +9,14 @@ public class RedisProtocolParser {
 
     public List<String> parseRESPMessage(BufferedReader br, long currentTimestamp) throws IOException {
         List<String> mainInputLines = new ArrayList<>();
-        System.out.println("IN parsing RESP Message");
+       // System.out.println("IN parsing RESP Message");
 
         String line = br.readLine();
         currentTimestamp = System.currentTimeMillis();
-        System.out.println("******* Next Line ");
+      //  System.out.println("******* Next Line ");
 
         if(line == null || !line.startsWith("*") || line.isEmpty()){
-            System.out.println("******* In null Line read ");
+       //     System.out.println("******* In null Line read ");
             //throw new IOException("Invalid RESP message");
             return new ArrayList<>();
         }

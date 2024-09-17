@@ -98,7 +98,6 @@ public class Main {
 
            while (true) {
                 try {
-                    System.out.println("Sending commands for parsing \n");
                     long currentTime = 0;
 
 
@@ -141,7 +140,7 @@ public class Main {
 
         IRedisCommandHandler redisCommandHandler = CommandFactory.getCommandFromAvailableCommands(command.getCommand());
 
-        System.out.printf("Checking value for redis command handler %s\n", redisCommandHandler != null ? redisCommandHandler.getClass().getName() : "null");
+//        System.out.printf("Checking value for redis command handler %s\n", redisCommandHandler != null ? redisCommandHandler.getClass().getName() : "null");
 
         if (redisCommandHandler != null) {
             System.out.println("***** Control is here, processing command");
