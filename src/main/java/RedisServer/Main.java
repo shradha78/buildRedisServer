@@ -62,7 +62,7 @@ public class Main {
 
                         System.out.println("Connected with Client : " + finalClientSocket.getPort() );
 
-                        ClientSession session = new ClientSession();
+                        ClientSession session = new ClientSession(finalClientSocket);
 
                         handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
