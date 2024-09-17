@@ -58,6 +58,16 @@ public class Main {
             port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
 
             serverSocket = new ServerSocket(port);
+            if (DataUtils.ReplicationDataHandler.isIsReplica()) {
+                RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
+                        DataUtils.ReplicationDataHandler.getMaster_host(),
+                        DataUtils.ReplicationDataHandler.getMaster_port(),
+                        DataUtils.ReplicationDataHandler.getPortToConnect()
+                );
+                System.out.println("Replica thread: " + Thread.currentThread().getName());
+                redisSlaveServer.initializeSlaveServer(redisSlaveServer);
+
+            }
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
             serverSocket.setReuseAddress(true);
@@ -77,19 +87,6 @@ public class Main {
                         System.out.println("Is client a slave : " + finalIsReplica);
 
                         ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
-
-                        if (DataUtils.ReplicationDataHandler.isIsReplica()) {
-                            RedisSlaveServer redisSlaveServer = new RedisSlaveServer(
-                                    DataUtils.ReplicationDataHandler.getMaster_host(),
-                                    DataUtils.ReplicationDataHandler.getMaster_port(),
-                                    DataUtils.ReplicationDataHandler.getPortToConnect()
-                            );
-                            System.out.println("Replica thread: " + Thread.currentThread().getName());
-                            redisSlaveServer.initializeSlaveServer(redisSlaveServer);
-
-                        }
-
-
                         handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
                         e.printStackTrace();
