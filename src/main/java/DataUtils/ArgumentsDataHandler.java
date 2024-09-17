@@ -7,7 +7,7 @@ import RedisServer.Main;
 
 import java.io.IOException;
 
-import static RedisServer.Main.latch;
+
 
 public class ArgumentsDataHandler {
 
