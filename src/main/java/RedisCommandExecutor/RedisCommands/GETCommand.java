@@ -34,6 +34,7 @@ public class GETCommand implements IRedisCommandHandler{
 
         parsingRDBFile(outputStream);//In case the key exists in db file
 
+
         KeyValue keyValue = DataUtils.KeyValuePairData.getSpecificKeyDetails(key);
 
         if (keyValue == null || keyValue.isExpired()) {

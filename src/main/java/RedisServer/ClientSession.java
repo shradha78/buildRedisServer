@@ -12,15 +12,26 @@ public class ClientSession {
     private Queue<RedisCommand> commandQueue;
     private Socket socket;
     private OutputStream outputStream;
+    private boolean isReplica;
 
     public ClientSession(Socket socket) throws IOException {
         this.socket = socket;
         this.outputStream = socket.getOutputStream();
         this.commandQueue = new LinkedList<>();
+        this.isReplica = false;
     }
 
     public OutputStream getOutputStream() {
         return outputStream;
+    }
+
+    public boolean isReplica() {
+        return isReplica;
+    }
+
+    public ClientSession setReplica(boolean replica) {
+        isReplica = replica;
+        return this;
     }
 
     // Method to send commands to this replica

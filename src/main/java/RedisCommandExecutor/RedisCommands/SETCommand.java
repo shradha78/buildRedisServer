@@ -42,7 +42,9 @@ public class SETCommand implements IRedisCommandHandler{
 
         DataUtils.KeyValuePairData.addKeyValueData(setKey,new KeyValue(setKey,setValue, expiryTime));
 
-        sendSimpleOKResponse(outputStream);
+        if(!session.isReplica()) {
+            sendSimpleOKResponse(outputStream);
+        }
     }
 
 }
