@@ -23,6 +23,7 @@ public class CommandFactory {
         commands.put("CONFIG", new ConfigGetCommand());
         commands.put("KEYS", new KeysCommand());
         commands.put("INFO", new InfoCommand());
+        commands.put("REPLCONF", new ReplconfCommand());
 
     }
 

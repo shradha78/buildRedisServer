@@ -23,8 +23,9 @@ public class RedisReplicaHandshake {
             if (receiveResponse().equals("+OK")) {
                 sendReplconfCapaPsync2();
                 if (receiveResponse().equals("+OK")) {
-                    System.out.println("Handshake part 2 complete.");
                     sendPsync();
+                    // Ignoring response for now as instructed
+                    receiveResponse(); // Expect +FULLRESYNC <REPL_ID> 0
                 } else {
                     System.out.println("Failed on REPLCONF capa psync2");
                 }
