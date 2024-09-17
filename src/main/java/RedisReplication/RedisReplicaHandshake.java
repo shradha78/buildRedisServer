@@ -1,5 +1,6 @@
 package RedisReplication;
 
+import RedisServer.ClientHandler;
 import RedisServer.ClientSession;
 
 import java.io.*;
@@ -26,6 +27,14 @@ public class RedisReplicaHandshake {
                 sendReplconfCapaPsync2();
                 if (receiveResponse().equals("+OK")) {
                     sendPsync();
+                    new Thread(() -> {
+                        try {
+                            System.out.println("Starting ClientHandler thread.");
+                            new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
                     // Ignoring response for now as instructed
                     receiveResponse();// Expect +FULLRESYNC <REPL_ID> 0
                     System.out.println("After Psync, receiving response " + receiveResponse());
