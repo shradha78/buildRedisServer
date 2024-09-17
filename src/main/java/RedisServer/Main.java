@@ -46,6 +46,7 @@ public class Main {
 
         try {
             port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
+
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
@@ -54,15 +55,17 @@ public class Main {
             while (true) {
                 // Wait for connection from client.
                 clientSocket = serverSocket.accept();
+                boolean isReplica = DataUtils.ReplicationDataHandler.isIsReplica();
 
                 final Socket finalClientSocket = clientSocket;
+                final boolean finalIsReplica = isReplica;
 
                 new Thread(() -> {
                     try {
 
                         System.out.println("Connected with Client : " + finalClientSocket.getPort() );
 
-                        ClientSession session = new ClientSession(finalClientSocket);
+                        ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
 
                         handlingClientCommands(finalClientSocket, session);
                     } catch (IOException e) {
@@ -144,7 +147,11 @@ public class Main {
 
         if (redisCommandHandler != null) {
             System.out.println("***** Control is here, processing command");
-            redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
+            if(session.isReplica()) {
+                redisCommandHandler.execute(command.getListOfCommandArguments(), outputStream, session);
+            }else{
+                redisCommandHandler.execute(command.getListOfCommandArguments(), null, session);
+            }
         } else {
             sendErrorResponse(outputStream, " Unknown Command");
         }

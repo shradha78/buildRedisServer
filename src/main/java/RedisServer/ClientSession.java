@@ -14,11 +14,11 @@ public class ClientSession {
     private OutputStream outputStream;
     private boolean isReplica;
 
-    public ClientSession(Socket socket) throws IOException {
+    public ClientSession(Socket socket,boolean isReplica) throws IOException {
         this.socket = socket;
         this.outputStream = socket.getOutputStream();
         this.commandQueue = new LinkedList<>();
-        this.isReplica = false;
+        this.isReplica = isReplica;
     }
 
     public OutputStream getOutputStream() {
