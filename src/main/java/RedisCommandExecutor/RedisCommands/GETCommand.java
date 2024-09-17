@@ -37,13 +37,15 @@ public class GETCommand implements IRedisCommandHandler{
 
         KeyValue keyValue = DataUtils.KeyValuePairData.getSpecificKeyDetails(key);
 
-        if (keyValue == null || keyValue.isExpired()) {
-            KeyValuePairData.removeKeyValueData(key);
+        if(outputStream != null) {
+            if (keyValue == null || keyValue.isExpired()) {
+                KeyValuePairData.removeKeyValueData(key);
 
-            sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");
-        } else {
-            sendBulkStringResponse(outputStream, keyValue.getValue(), "Response for GET ");
+                sendBulkStringResponse(outputStream, "", "Value has expired or doesn't exist");
+            } else {
+                sendBulkStringResponse(outputStream, keyValue.getValue(), "Response for GET ");
 
+            }
         }
     }
 }
