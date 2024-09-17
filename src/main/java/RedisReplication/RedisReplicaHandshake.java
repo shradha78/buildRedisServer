@@ -61,7 +61,7 @@ public class RedisReplicaHandshake {
         long length = RedisServerConfig.getReplicationId().length();
         String replIdLength = "$" + length;
         String psyncMessage = "*3\r\n$5\r\nPSYNC\r\n" + "$1" + "\r\n"+ "?" + "\r\n"
-                                            +"$1\r\n" + "0" + "\r\n";
+                                            +"$1\r\n" + "-1" + "\r\n";
         outputStream.write(psyncMessage.getBytes());
         outputStream.flush();
         System.out.println("PSYNC sent to master");
