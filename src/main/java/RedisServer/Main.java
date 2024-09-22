@@ -30,7 +30,7 @@ public class Main {
         Socket clientSocket = null;
 
         int port = 6379;
-        port = DataUtils.ReplicationDataHandler.getPortToConnect() != 0  ? ReplicationDataHandler.getPortToConnect() : port;
+        port = DataUtils.ReplicationDataHandler.isIsReplica() ? ReplicationDataHandler.getMaster_port() : port;
         listenToPort(clientSocket, port);
 
     }
