@@ -33,8 +33,8 @@ public class RedisReplicaServer {
     public void connectToMaster() throws IOException {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
         try {
-             this.masterSocket = new Socket(masterHost, masterPort);
-             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
+             this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
+             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, masterPort);
 //            new Thread(() ->{
                 try {
                     System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
@@ -54,7 +54,7 @@ public class RedisReplicaServer {
 
     public void initializeSlaveServer(RedisReplicaServer slaveServer) {
 
-        System.out.println("Slave server details : " + slaveServer.getMasterHost() + " " + slaveServer.getMasterPort() + " " + slaveServer.getReplicaPort());
+        System.out.println("Slave server details : " + "\n" + "Master Host : " + slaveServer.getMasterHost() + " Master Port : " + slaveServer.getMasterPort() + " Replica Port :" + slaveServer.getReplicaPort());
             try {
                 slaveServer.connectToMaster();
                 System.out.println("Replica server is fully initialized and listening on port " + replicaPort);

@@ -30,13 +30,13 @@ public class Main {
         Socket clientSocket = null;
 
         int port = 6379;
-        port = DataUtils.ReplicationDataHandler.isIsReplica() ? ReplicationDataHandler.getMaster_port() : port;
+        port = DataUtils.ReplicationDataHandler.isIsReplica() ? ReplicationDataHandler.getPortToConnect() : port;
         listenToPort(clientSocket, port);
 
     }
 
 
-    private static void listenToPort(Socket clientSocket, int port) {
+    private static void listenToPort(Socket clientSocket, int port)   {
 
         ServerSocket serverSocket;
         try {
