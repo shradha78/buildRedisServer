@@ -24,7 +24,7 @@ public class Main {
                     DataUtils.ReplicationDataHandler.getPortToConnect()
             );
             System.out.println("Replica thread: " + Thread.currentThread().getName());
-            redisReplicaServer.initializeSlaveServer(redisReplicaServer);
+            new Thread(() ->redisReplicaServer.initializeSlaveServer(redisReplicaServer)).start();
 //            try {
 //                new Thread(new ClientHandler(redisReplicaServer.getMasterSocket(),new ClientSession(redisReplicaServer.getMasterSocket(),true))).start();
 //            } catch (IOException e) {
@@ -35,7 +35,7 @@ public class Main {
         Socket clientSocket = null;
 
         int port = 6379;
-//        port = DataUtils.ReplicationDataHandler.isIsReplica() ? ReplicationDataHandler.getPortToConnect() : port;
+        port = DataUtils.ReplicationDataHandler.isIsReplica() ? ReplicationDataHandler.getPortToConnect() : port;
         listenToPort(clientSocket, port);
 
     }
