@@ -32,7 +32,7 @@ public class RedisReplicaServer {
 
     public void connectToMaster() throws IOException {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
-        new Thread(() ->{
+//        new Thread(() ->{
             try {
                 this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
             } catch (IOException e) {
@@ -52,7 +52,7 @@ public class RedisReplicaServer {
                 e.printStackTrace();
                 System.out.println("Failed to start handshake.");
             }
-       }).start();
+//       }).start();
 
     }
 
