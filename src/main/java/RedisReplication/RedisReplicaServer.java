@@ -6,6 +6,8 @@ import RedisServer.ClientSession;
 import java.io.IOException;
 import java.net.Socket;
 
+import static RedisServer.Main.listenToPort;
+
 public class RedisReplicaServer {
     private final String masterHost;
     private final int masterPort;
@@ -61,14 +63,8 @@ public class RedisReplicaServer {
         System.out.println("Slave server details : " + "\n" + "Master Host : " + slaveServer.getMasterHost() + " Master Port : " + slaveServer.getMasterPort() + " Replica Port :" + slaveServer.getReplicaPort());
             try {
                 slaveServer.connectToMaster();
+                new Thread(() -> listenToPort(null, slaveServer.getReplicaPort())).start();
                 System.out.println("Replica server is fully initialized and listening on port " + replicaPort);
-//                new Thread(() -> {
-//                    try {
-
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }).start();
             } catch (IOException e) {
                 System.out.println("Failed to connect with Master");
                 e.printStackTrace();

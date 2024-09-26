@@ -25,11 +25,11 @@ public class Main {
             );
             System.out.println("Replica thread: " + Thread.currentThread().getName());
             redisReplicaServer.initializeSlaveServer(redisReplicaServer);
-            try {
-                new Thread(new ClientHandler(redisReplicaServer.getMasterSocket(),new ClientSession(redisReplicaServer.getMasterSocket(),true))).start();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                new Thread(new ClientHandler(redisReplicaServer.getMasterSocket(),new ClientSession(redisReplicaServer.getMasterSocket(),true))).start();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
         }
 
         Socket clientSocket = null;
@@ -41,7 +41,7 @@ public class Main {
     }
 
 
-    private static void listenToPort(Socket clientSocket, int port)   {
+    public static void listenToPort(Socket clientSocket, int port)   {
 
         ServerSocket serverSocket;
         try {
@@ -55,11 +55,8 @@ public class Main {
                 // Wait for connection from client.
                 clientSocket = serverSocket.accept();
                 boolean isReplica = DataUtils.ReplicationDataHandler.isIsReplica();
-
-                final Socket finalClientSocket = clientSocket;
-                final boolean finalIsReplica = isReplica;
-                ClientSession session = new ClientSession(finalClientSocket,finalIsReplica);
-                new Thread(new ClientHandler(finalClientSocket,session)).start();
+                ClientSession session = new ClientSession(clientSocket,isReplica);
+                new Thread(new ClientHandler(clientSocket,session)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
