@@ -1,6 +1,7 @@
 package RedisCommandExecutor.RedisCommands;
 
 import DataUtils.MasterWriteCommands;
+import RedisReplication.RedisServerConfig;
 import RedisServer.ClientSession;
 import DataUtils.KeyValue;
 
@@ -9,7 +10,8 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import static RedisCommandExecutor.RedisCommands.PSYNCCommand.queues;
+import static DataUtils.ReplicationDataHandler.queues;
+
 import static RedisResponses.ShortParsedResponses.sendSimpleOKResponse;
 
 
@@ -28,7 +30,14 @@ public class SETCommand implements IRedisCommandHandler{
 
         String respArray = "";
         respArray += "*3\r\n$3\r\nSET\r\n"+ "$" + setKey.length() + "\r\n" + setKey + "\r\n" + "$" + setValue.length() + "\r\n" + setValue + "\r\n";
-        MasterWriteCommands.addWriteCommand(respArray);
+        try {
+            for (BlockingQueue<String> queue : queues) {
+                queue.put(respArray);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+//        MasterWriteCommands.addWriteCommand(respArray);
 //        try {
 //            for (BlockingQueue<String> queue : queues) {
 //                queue.put(respArray);
@@ -51,7 +60,7 @@ public class SETCommand implements IRedisCommandHandler{
 
         DataUtils.KeyValuePairData.addKeyValueData(setKey,new KeyValue(setKey,setValue, expiryTime));
         System.out.println("Is client a slave ? " + session.isReplica());
-        if(!session.isReplica()) {
+        if(RedisServerConfig.getInstance().getRole().equals("master")) {
             sendSimpleOKResponse(outputStream);
         }
     }

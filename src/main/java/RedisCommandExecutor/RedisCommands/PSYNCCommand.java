@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import static DataUtils.ReplicationDataHandler.queues;
+
 
 public class PSYNCCommand implements IRedisCommandHandler{
-    public static List<BlockingQueue<String>> queues = new ArrayList<>();
+    //public static List<BlockingQueue<String>> queues = new ArrayList<>();
     @Override
     public void execute(List<String> args, OutputStream outputStream, ClientSession session) throws IOException {
         System.out.println("Received Psync command from replica");
@@ -34,19 +36,30 @@ public class PSYNCCommand implements IRedisCommandHandler{
 
         outputStream.write(contents);
 
-        System.out.println("Adding current session to replicas list");
-        //session.setReplica(true);
-        ReplicaManager.addReplica(session);
-
-        System.out.println("Added current session to replicas list");
-
-        // After the handshake, propagate existing commands
-        List<String> commands = MasterWriteCommands.getWriteCommands();
-        for (String command : commands) {
-            System.out.println("Commands for write: " + command);
-            outputStream.write(command.getBytes());
-            outputStream.flush();
+        BlockingQueue<String> queue = new LinkedBlockingDeque<>();
+        queues.add(queue);
+        try {
+            while (true) {
+                String element = queue.take();
+                outputStream.write(element.getBytes());
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+
+//        System.out.println("Adding current session to replicas list");
+//        //session.setReplica(true);
+//        ReplicaManager.addReplica(session);
+//
+//        System.out.println("Added current session to replicas list");
+//
+//        // After the handshake, propagate existing commands
+//        List<String> commands = MasterWriteCommands.getWriteCommands();
+//        for (String command : commands) {
+//            System.out.println("Commands for write: " + command);
+//            outputStream.write(command.getBytes());
+//            outputStream.flush();
+//        }
 //        BlockingQueue<String> queue = new LinkedBlockingDeque<>();
 //        queues.add(queue);
 //        try {

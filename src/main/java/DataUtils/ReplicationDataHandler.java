@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 public class ReplicationDataHandler {
     private static int portToConnect = 0;
     private static boolean isReplica = false;
     private static String master_host ="";
     private static int master_port;
+    public static List<BlockingQueue<String>> queues = new ArrayList<>();
 
     public static String getMaster_host() {
         return master_host;
