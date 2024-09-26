@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ClientSession implements Runnable{
+public class ClientSession {
     private Queue<RedisCommand> commandQueue;
     private Socket socket;
     private OutputStream outputStream;
@@ -50,8 +50,4 @@ public class ClientSession implements Runnable{
         return commandQueue;
     }
 
-    @Override
-    public void run() {
-
-    }
 }

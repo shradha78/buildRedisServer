@@ -18,6 +18,10 @@ public class RedisReplicaServer {
         this.replicaPort = replicaPort;
     }
 
+    public Socket getMasterSocket() {
+        return masterSocket;
+    }
+
     public String getMasterHost() {
         return masterHost;
     }
@@ -60,8 +64,7 @@ public class RedisReplicaServer {
                 System.out.println("Replica server is fully initialized and listening on port " + replicaPort);
 //                new Thread(() -> {
 //                    try {
-//                        System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
-                        new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
+
 //                    } catch (IOException e) {
 //                        throw new RuntimeException(e);
 //                    }

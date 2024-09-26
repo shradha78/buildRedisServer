@@ -25,6 +25,11 @@ public class Main {
             );
             System.out.println("Replica thread: " + Thread.currentThread().getName());
             redisReplicaServer.initializeSlaveServer(redisReplicaServer);
+            try {
+                new Thread(new ClientHandler(redisReplicaServer.getMasterSocket(),new ClientSession(redisReplicaServer.getMasterSocket(),true))).start();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Socket clientSocket = null;
