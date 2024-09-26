@@ -34,7 +34,7 @@ public class RedisReplicaServer {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
         try {
              this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
-             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, masterPort);
+             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
 //            new Thread(() ->{
                 try {
                     System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
