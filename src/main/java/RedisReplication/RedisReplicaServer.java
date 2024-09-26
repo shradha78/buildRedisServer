@@ -32,33 +32,28 @@ public class RedisReplicaServer {
 
     public void connectToMaster() throws IOException {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
-        try {
-            new Thread(() ->{
-                try {
-                    this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                RedisReplicaHandshake handshake = null;
-                try {
-                    handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        new Thread(() ->{
+            try {
+                this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            RedisReplicaHandshake handshake = null;
+            try {
+                handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 //            new Thread(() ->{
-                try {
-                    System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
-                    handshake.startHandshake();
-                }catch (IOException e){
-                    e.printStackTrace();
-                    System.out.println("Failed to start handshake.");
-                }
-           }).start();
+            try {
+                System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
+                handshake.startHandshake();
+            }catch (IOException e){
+                e.printStackTrace();
+                System.out.println("Failed to start handshake.");
+            }
+       }).start();
 
-        } catch (IOException e) {
-            System.out.println("Failed to connect to master at " + masterHost + ":" + masterPort);
-            throw new RuntimeException(e);
-        }
     }
 
 
