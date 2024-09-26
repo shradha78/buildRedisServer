@@ -33,8 +33,18 @@ public class RedisReplicaServer {
     public void connectToMaster() throws IOException {
         System.out.println("Connecting to master at " + masterHost + ":" + masterPort);
         try {
-             this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
-             RedisReplicaHandshake handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
+            new Thread(() ->{
+                try {
+                    this.masterSocket = new Socket(masterHost, masterPort);//creating connection with master
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                RedisReplicaHandshake handshake = null;
+                try {
+                    handshake = new RedisReplicaHandshake(masterSocket, replicaPort);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 //            new Thread(() ->{
                 try {
                     System.out.println("Starting handshake on thread : " + Thread.currentThread().getName());
@@ -43,7 +53,7 @@ public class RedisReplicaServer {
                     e.printStackTrace();
                     System.out.println("Failed to start handshake.");
                 }
-//            }).start();
+           }).start();
 
         } catch (IOException e) {
             System.out.println("Failed to connect to master at " + masterHost + ":" + masterPort);
@@ -58,14 +68,14 @@ public class RedisReplicaServer {
             try {
                 slaveServer.connectToMaster();
                 System.out.println("Replica server is fully initialized and listening on port " + replicaPort);
-                new Thread(() -> {
-                    try {
-                        System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
-                        new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).start();
+//                new Thread(() -> {
+//                    try {
+//                        System.out.println("Master socket is : "+ masterSocket.getInetAddress() + ":" + masterSocket.getPort());
+//                        new Thread(new ClientHandler(masterSocket,new ClientSession(masterSocket,true))).start();
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }).start();
             } catch (IOException e) {
                 System.out.println("Failed to connect with Master");
                 e.printStackTrace();

@@ -27,7 +27,7 @@ public class RedisReplicaHandshake {
                 sendReplconfCapaPsync2();
                 if (receiveResponse().equals("+OK")) {
                     sendPsync();
-                    // Ignoring response for now as instructed
+
                     receiveResponse();// Expect +FULLRESYNC <REPL_ID> 0
                     System.out.println("After Psync, receiving response " + receiveResponse());
                 } else {
